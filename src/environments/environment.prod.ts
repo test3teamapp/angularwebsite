@@ -1,3 +1,5 @@
 export const environment = {
-  production: true
+  production: true,
+  wsEndpoint: 'ws://localhost:8081/api/v1/ws',
+  reconnectInterval: 2000
 };

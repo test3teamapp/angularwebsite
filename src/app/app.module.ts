@@ -1,6 +1,7 @@
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { BrowserModule }    from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
@@ -18,6 +19,8 @@ import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.compon
     BrowserAnimationsModule,
     FormsModule,
     RouterModule,
+    BrowserModule,
+    // import HttpClientModule after BrowserModule.
     HttpClientModule,
     NavbarModule,
     FooterModule,

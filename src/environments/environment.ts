@@ -4,5 +4,7 @@
 // The list of which env maps to which file can be found in `angular-cli.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  wsEndpoint: 'ws://localhost:8081/api/v1/ws',
+  reconnectInterval: 2000
 };

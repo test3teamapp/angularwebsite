@@ -1,9 +1,14 @@
 <div class="main-content">
-
-          <ngui-map zoom="13" center="40.748817,-73.985428" style="margin-top:60px;height: 100%; width: 100%; position: absolute;top: 0px;
-    left: 0px;
-    background-color: rgb(229, 227, 223);">
-              <marker [position]="[40.748817,-73.985428]"></marker>
-          </ngui-map>
-
+  <button (click)="showLastSpyrecordForUser()">get</button>
+  <ngui-map 
+  zoom="13" 
+  center="37.775, -122.434" 
+  (mapReady$)="onMapReady($event)"
+  (mapClick)="onMapClick($event)"
+  (idle)="onIdle($event)"
+  mapTypeId="satellite">
+    <marker *ngFor="let pos of positions" 
+      [position]="pos"
+      (initialized$)="onMarkerInit($event)"></marker>
+</ngui-map>
 </div>

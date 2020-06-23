@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { LbdModule } from '../../lbd/lbd.module';
 import { NguiMapModule} from '@ngui/map';
+import { WebsocketModule } from '../../websocket/websocket.module';
 
 import { AdminLayoutRoutes } from './admin-layout.routing';
 
@@ -24,6 +25,7 @@ import { UpgradeComponent } from '../../upgrade/upgrade.component';
     RouterModule.forChild(AdminLayoutRoutes),
     FormsModule,
     LbdModule,
+    WebsocketModule,
     NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?key=AIzaSyD_SJhBG9d_s46ME-nP5IP6jZnrQNO7uHs'})
   ],
   declarations: [
