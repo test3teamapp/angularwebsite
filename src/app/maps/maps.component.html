@@ -15,8 +15,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let row of tableData1.dataRows">
-                  <td *ngFor="let cell of row">{{ cell }}</td>
+                <tr *ngFor="let row of tableData1.dataRows" (click)="showLastSpyrecordForUser(row.userid)">
+                  <td>{{row.userid}}</td><td>{{row.servertime}}</td><td>{{row.lat}}</td><td>{{row.lng}}</td>
                 </tr>
               </tbody>
             </table>
@@ -25,8 +25,27 @@
       </div>
     </div>
   </div>
-
-  <button (click)="showLastSpyrecordForUser()">get</button>
+  <form class="form-inline">
+    <div class="form-group">
+      <input type="search"
+             class="form-control"
+             placeholder="Enter user id"
+             #search>
+    </div>
+    <button class="btn btn-primary"
+            (click)="showLastSpyrecordForUser(search.value)">
+            Search
+    </button>
+    <button class="btn btn-primary"
+            (click)="showLastSpyrecordForUserPromise(search.value)">
+            Search (with promise)
+    </button>
+    <button class="btn btn-primary"
+            (click)="clearMarkers()">
+            CLEAR MARKERS
+    </button>
+  </form>
+  
   <div>
     <ngui-map
       zoom="13"
