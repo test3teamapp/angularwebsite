@@ -6,5 +6,6 @@
 export const environment = {
   production: false,
   wsEndpoint: 'ws://localhost:8081/api/v1/ws',
+  endpointUrl: "https://127.0.0.1:8081/api/v1/",
   reconnectInterval: 2000
 };

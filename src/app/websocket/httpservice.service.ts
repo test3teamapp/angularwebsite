@@ -6,7 +6,9 @@ import { Observable, throwError } from "rxjs";
 import { catchError, retry } from "rxjs/operators";
 import "rxjs/add/operator/toPromise";
 import { getJSON } from "@ngui/map/services/util";
+import { environment } from '../../environments/environment';
 
+const URL_ENDPOINT = environment.endpointUrl;
 declare var $: any;
 
 export enum Alarmtype {
@@ -38,8 +40,7 @@ export class SpyrecordClass {
 
 @Injectable()
 export class HttpService {
-  endpointUrl = "https://127.0.0.1:8081/api/v1/";
-  //endpointUrl = "http://158.101.171.124:8081/api/v1/";
+ 
   results: SpyrecordClass[];
   loading: boolean;
 
@@ -50,7 +51,7 @@ export class HttpService {
 
   getLastSpyrecordOfUser(userId: string) {
     return this.http
-      .get<Spyrecord>(this.endpointUrl + "user/" + userId, {
+      .get<Spyrecord>(URL_ENDPOINT + "user/" + userId, {
         responseType: "json",
       })
       .pipe(
@@ -62,7 +63,7 @@ export class HttpService {
 
   getLastSpyrecordsOfUsers(userIds: string) {
     return this.http
-      .get(this.endpointUrl + "users/" + userIds, {
+      .get(URL_ENDPOINT + "users/" + userIds, {
         responseType: "json",
       })
       .pipe(
