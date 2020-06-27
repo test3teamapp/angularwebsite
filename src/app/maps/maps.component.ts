@@ -5,6 +5,7 @@ import {
   Spyrecord,
   SpyrecordClass,
   HttpService,
+  Alarmtype
 } from "../websocket/httpservice.service";
 import { NguiMapModule, NguiMapComponent } from "@ngui/map";
 import { HttpClient } from "@angular/common/http";
@@ -67,6 +68,8 @@ export class MapsComponent implements OnInit, OnDestroy {
           console.log(" Response message: " + data.message);
           this.error = data.message;
           //reject(res);
+          this.httpService.showNotification(Alarmtype.WARNING, data.message);
+
         } else {
           this.spyrecord = {
             serialkey: data["Serialkey"],
@@ -91,7 +94,10 @@ export class MapsComponent implements OnInit, OnDestroy {
           this.googleMapObject.zoom = 18;
         }
       },
-      (error) => (this.error = error), // error path
+      (error) => { // error path
+        this.error = error
+        this.httpService.showNotification(Alarmtype.DANGER, error);
+      },
       () => {
         console.log("http call finished");
         console.log("spyrecord: " + this.spyrecord);
@@ -113,8 +119,8 @@ export class MapsComponent implements OnInit, OnDestroy {
           console.log(" Response message: " + data.message);
           this.error = data.message;
           //reject(res);
+          this.httpService.showNotification(Alarmtype.WARNING, data.message);
         } else {
-
           this.tableData1.dataRows = data.map((item) => {
             //console.log(item["Userid"]);
             return new SpyrecordClass(
@@ -123,82 +129,21 @@ export class MapsComponent implements OnInit, OnDestroy {
               item["Userid"],
               item["Jsondata"],
               item["Lat"],
-              item["Lng"],
+              item["Lng"]
             );
           });
-
         }
-
       },
-      (error) => (this.error = error), // error path
+      (error) => {
+        this.error = error
+        this.httpService.showNotification(Alarmtype.DANGER, error);
+      }, // error path
       () => {
         console.log("http call finished");
         console.log("table rows number: " + this.tableData1.dataRows.length);
         console.log("error: " + this.error);
       }
     );
-  }
-
-  showLastSpyrecordForUserPromise(userselected: string) {
-    // initialise
-    this.clear();
-
-    let promise = new Promise((resolve, reject) => {
-      //TODO
-      this.http
-        .get(this.httpService.endpointUrl + "user/" + userselected, {
-          responseType: "json",
-        })
-        .toPromise()
-        .then(
-          (res: any) => {
-            // Success
-            console.log("Promise response: " + res);
-            //var checkRes = JSON.parse(res);
-            if (res.message) {
-              // not the result we expected
-              console.log("Promise response message: " + res.message);
-              this.error = res.message;
-              //reject(res);
-            } else {
-              this.spyrecord = {
-                serialkey: res["Serialkey"],
-                servertime: res["Servertime"],
-                userid: res["Userid"],
-                jsondata: res["Jsondata"],
-                lat: res["Lat"],
-                lng: res["Lng"],
-              };
-
-              if (this.spyrecord !== undefined) {
-                this.positions.push([this.spyrecord.lat, this.spyrecord.lng]);
-
-                this.googleMapObject.panTo(
-                  new google.maps.LatLng({
-                    lat: this.spyrecord.lat,
-                    lng: this.spyrecord.lng,
-                  })
-                );
-                this.googleMapObject.zoom = 18;
-              }
-            }
-
-            console.log("spyrecord: " + String(this.spyrecord));
-            console.log("positions: " + this.positions);
-            console.log("error: " + this.error);
-
-            resolve();
-          },
-          (err: HttpErrorResponse) => {
-            // Error
-            console.log("Promise error: " + err.message);
-            this.error = err;
-            reject(err);
-          }
-        );
-    });
-
-    return promise;
   }
 
   onMapReady(map) {

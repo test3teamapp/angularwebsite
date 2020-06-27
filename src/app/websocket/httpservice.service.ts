@@ -7,6 +7,16 @@ import { catchError, retry } from "rxjs/operators";
 import "rxjs/add/operator/toPromise";
 import { getJSON } from "@ngui/map/services/util";
 
+declare var $: any;
+
+export enum Alarmtype {
+  NONE = "",
+  INFO = "info",
+  SUCCESS =  "success",
+  WARNING =  "warning",
+  DANGER =  "danger"
+}
+
 export interface Spyrecord {
   serialkey: number;
   servertime: string;
@@ -28,8 +38,8 @@ export class SpyrecordClass {
 
 @Injectable()
 export class HttpService {
-  //endpointUrl = "http://127.0.0.1:8081/api/v1/";
-  endpointUrl = "http://158.101.171.124:8081/api/v1/";
+  endpointUrl = "https://127.0.0.1:8081/api/v1/";
+  //endpointUrl = "http://158.101.171.124:8081/api/v1/";
   results: SpyrecordClass[];
   loading: boolean;
 
@@ -61,60 +71,41 @@ export class HttpService {
       );
   }
 
-
-  getPromiseLastSpyrecordOfUser(userId: string) {
-    let promise = new Promise((resolve, reject) => {
-      //TODO
-      this.http
-        .get(this.endpointUrl + "user/" + userId, {
-          responseType: "json",
-        })
-        .toPromise()
-        .then(
-          (res: any) => {
-            // Success
-            console.log(res);
-            //var checkRes = JSON.parse(res);
-            if (res.message){
-              // not the result we expected
-              console.log(res.message);
-              reject(res.message);
-            }
-
-            // this.results = res.json().map((item: any) => {
-            //   return new SpyrecordClass(
-            //     item.serialkey,
-            //     item.servertime,
-            //     item.userid,
-            //     item.jsondata,
-            //     item.lat,
-            //     item.lng
-            //   );
-            // });
-            resolve(res);
-          },
-          (err) => {
-            // Error
-            reject(err);
-          }
-        );
-    });
-
-    return promise;
-  }
-
   private handleError(error: HttpErrorResponse) {
+    var erroMsg = "";
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       console.error("An error occurred:", error.error.message);
+      erroMsg = "An error occurred:" + error.error.message;
     } else {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong,
       console.error(
         `Backend returned code ${error.status}, ` + `body was: ${error.error}`
       );
+      erroMsg = "Backend returned code " + error.status + ", body was: " + error.error;
     }
     // return an observable with a user-facing error message
-    return throwError("Something bad happened; please try again later.");
+    return throwError(erroMsg);
+  }
+
+  showNotification(alarmtype, msg) {
+
+    //var color = Math.floor(Math.random() * 4 + 1);
+    $.notify(
+      {
+        icon: "pe-7s-attention",
+        message:
+          msg,
+      },
+      {
+        type: alarmtype,
+        timer: 1000,
+        placement: {
+          from: "top",
+          align: "center",
+        },
+      }
+    );
   }
 }
