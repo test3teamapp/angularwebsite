@@ -1,3 +1,8 @@
+
+### Installation of angular project after download: 
+Run "npm install", then you should be able to run "ng serve --open"
+
+
 # [Light Bootstrap Dashboard Angular](https://demos.creative-tim.com/light-bootstrap-dashboard-angular2/dashboard)
 [![version][version-badge]][CHANGELOG] ![license][license-badge]
 
