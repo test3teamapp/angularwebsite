@@ -5,7 +5,7 @@ import {
   Spyrecord,
   SpyrecordClass,
   HttpService,
-  Alarmtype
+  Alarmtype,
 } from "../websocket/httpservice.service";
 import { NguiMapModule, NguiMapComponent } from "@ngui/map";
 import { HttpClient } from "@angular/common/http";
@@ -69,7 +69,6 @@ export class MapsComponent implements OnInit, OnDestroy {
           this.error = data.message;
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.message);
-
         } else {
           this.spyrecord = {
             serialkey: data["Serialkey"],
@@ -94,8 +93,9 @@ export class MapsComponent implements OnInit, OnDestroy {
           this.googleMapObject.zoom = 18;
         }
       },
-      (error) => { // error path
-        this.error = error
+      (error) => {
+        // error path
+        this.error = error;
         this.httpService.showNotification(Alarmtype.DANGER, error);
       },
       () => {
@@ -105,6 +105,62 @@ export class MapsComponent implements OnInit, OnDestroy {
         console.log("error: " + this.error);
       }
     );
+  }
+
+  showPathOfUserForTimePeriod(usersselected: string, pastHours: number) {
+    this.clear();
+
+    this.httpService
+      .getSpyrecordOfUserForTimePeriod(usersselected, pastHours)
+      .subscribe(
+        (data: any) => {
+          // success path
+
+          if (data.message) {
+            // not the result we expected
+            console.log(" Response message: " + data.message);
+            this.error = data.message;
+            //reject(res);
+            this.httpService.showNotification(Alarmtype.WARNING, data.message);
+          } else {
+            var flightPlanCoordinates = [];
+
+            data.map((item) => {
+              //console.log(item["Userid"]);
+              flightPlanCoordinates.push(
+                new google.maps.LatLng({
+                  lat: item["Lat"],
+                  lng: item["Lng"],
+                })
+              );
+            });
+
+            var flightPath = new google.maps.Polyline({
+              path: flightPlanCoordinates,
+              geodesic: true,
+              strokeColor: "#FF0000",
+              strokeOpacity: 1.0,
+              strokeWeight: 2,
+            });
+
+            flightPath.setMap(this.googleMapObject);
+
+            this.googleMapObject.panTo(
+              flightPlanCoordinates[flightPlanCoordinates.length - 1]
+            );
+            this.googleMapObject.zoom = 18;
+          }
+        },
+        (error) => {
+          this.error = error;
+          this.httpService.showNotification(Alarmtype.DANGER, error);
+        }, // error path
+        () => {
+          console.log("http call finished");
+          console.log("table rows number: " + this.tableData1.dataRows.length);
+          console.log("error: " + this.error);
+        }
+      );
   }
 
   getListOfLastSpyrecordsForAllUsers(usersselected: string) {
@@ -135,7 +191,7 @@ export class MapsComponent implements OnInit, OnDestroy {
         }
       },
       (error) => {
-        this.error = error
+        this.error = error;
         this.httpService.showNotification(Alarmtype.DANGER, error);
       }, // error path
       () => {

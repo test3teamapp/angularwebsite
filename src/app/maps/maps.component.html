@@ -5,7 +5,13 @@
         <div class="card">
           <div class="header">
             <h4 class="title">Spyied list</h4>
-            <p class="category">Click on a row to see their last location on the map</p>
+            <p class="category">
+              Click on a user id to see their last location on the map
+            </p>
+            <p class="category">
+              Select a time interval on the side to see their path for
+              the time period
+            </p>
           </div>
           <div class="content table-responsive table-full-width">
             <table class="table table-hover table-striped">
@@ -15,8 +21,27 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let row of tableData1.dataRows" (click)="showLastSpyrecordForUser(row.userid)">
-                  <td>{{row.userid}}</td><td>{{row.servertime}}</td><td>{{row.lat}}</td><td>{{row.lng}}</td>
+                <tr *ngFor="let row of tableData1.dataRows">
+                  <td (click)="showLastSpyrecordForUser(row.userid)" style="cursor: pointer;">
+                    {{ row.userid }}
+                  </td>
+                  <td>{{ row.servertime }}</td>
+                  <td>{{ row.lat }}</td>
+                  <td>{{ row.lng }}</td>
+                  <td class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      <p>
+                        Time Interval
+                        <b class="caret"></b>
+                      </p>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li (click)="showPathOfUserForTimePeriod(row.userid,6)" style="cursor: pointer;"><a>6 hours</a></li>
+                      <li (click)="showPathOfUserForTimePeriod(row.userid,12)" style="cursor: pointer;" ><a>12 hours</a></li>
+                      <li (click)="showPathOfUserForTimePeriod(row.userid,24)" style="cursor: pointer;"><a>24 hours</a></li>
+                      <li (click)="showPathOfUserForTimePeriod(row.userid,48)" style="cursor: pointer;"><a>48 hours</a></li>
+                    </ul>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -27,21 +52,24 @@
   </div>
   <form class="form-inline">
     <div class="form-group">
-      <input type="search"
-             class="form-control"
-             placeholder="Enter user id"
-             #search>
+      <input
+        type="search"
+        class="form-control"
+        placeholder="Enter user id"
+        #search
+      />
     </div>
-    <button class="btn btn-primary"
-            (click)="showLastSpyrecordForUser(search.value)">
-            Search
+    <button
+      class="btn btn-primary"
+      (click)="showLastSpyrecordForUser(search.value)"
+    >
+      Search
     </button>
-    <button class="btn btn-primary"
-            (click)="clearMarkers()">
-            CLEAR MARKERS
+    <button class="btn btn-primary" (click)="clearMarkers()">
+      CLEAR MARKERS
     </button>
   </form>
-  
+
   <div>
     <ngui-map
       zoom="13"

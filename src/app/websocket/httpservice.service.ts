@@ -60,6 +60,16 @@ export class HttpService {
       );
   }
 
+  getSpyrecordOfUserForTimePeriod(userId: string, pastHours: number) {
+    return this.http
+      .get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/tp/" + pastHours, {
+        responseType: "json",
+      })
+      .pipe(
+        //retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
 
   getLastSpyrecordsOfUsers(userIds: string) {
     return this.http
