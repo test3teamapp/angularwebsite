@@ -124,6 +124,15 @@ export class MapsComponent implements OnInit, OnDestroy {
             this.httpService.showNotification(Alarmtype.WARNING, data.message);
           } else {
             var flightPlanCoordinates = [];
+            var flightPlanPositions = [];
+            var markerCounter = 0;
+            var maxDataReceived = 0;
+            var routeMarkerImage;
+            var routeMarker;
+
+            data.map((item) => {
+              maxDataReceived++;
+            });
 
             data.map((item) => {
               //console.log(item["Userid"]);
@@ -133,22 +142,46 @@ export class MapsComponent implements OnInit, OnDestroy {
                   lng: item["Lng"],
                 })
               );
+              var image;
+              if (markerCounter == 0) {
+                routeMarkerImage = "/assets/img/start-flag-icon-0_64x64.png";
+
+              }else if (markerCounter == maxDataReceived - 1){
+                routeMarkerImage = "/assets/img/flag-racing-png-2_64x64.png";
+
+              }else {
+                routeMarkerImage =
+                  "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
+              } 
+
+              markerCounter++;
+              routeMarker = new google.maps.Marker({
+                position: { lat: item["Lat"], lng: item["Lng"] },
+                map: this.googleMapObject,
+                icon: routeMarkerImage,
+                title: item["Servertime"],
+              });
             });
 
-            var flightPath = new google.maps.Polyline({
-              path: flightPlanCoordinates,
-              geodesic: true,
-              strokeColor: "#FF0000",
-              strokeOpacity: 1.0,
-              strokeWeight: 2,
-            });
+            if (flightPlanCoordinates.length > 1) {
+              var flightPath = new google.maps.Polyline({
+                path: flightPlanCoordinates,
+                geodesic: true,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2,
+              });
 
-            flightPath.setMap(this.googleMapObject);
+              flightPath.setMap(this.googleMapObject);
 
-            this.googleMapObject.panTo(
-              flightPlanCoordinates[flightPlanCoordinates.length - 1]
-            );
-            this.googleMapObject.zoom = 18;
+              this.googleMapObject.panTo(flightPlanCoordinates[0]);
+              this.googleMapObject.zoom = 10;
+            } else {
+              this.httpService.showNotification(
+                Alarmtype.INFO,
+                "Not enough data for path construction."
+              );
+            }
           }
         },
         (error) => {
