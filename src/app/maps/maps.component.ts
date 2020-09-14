@@ -107,6 +107,64 @@ export class MapsComponent implements OnInit, OnDestroy {
     );
   }
 
+  sendCommandOnUserDevice(userselected: string, command: string) {
+    this.clear();
+
+    // our client app handles these commands (as keys in the message)
+	  //mMsgCommandTRIGGERLU := "TRIGGER_LU"
+	  //mMsgCommandSTARTTRACKING := "START_TRACKING"
+    //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
+    // for triggering LU we expect to receive a spyrecord
+    // for starting stopping tracking we expect to receive only an ack
+    //TODO
+    this.httpService.sendCommandOnUserDevice(userselected, command).subscribe(
+      (data: any) => {
+        // success path
+
+        if (data.message) {
+          // not the result we expected
+          console.log(" Response message: " + data.message);
+          this.error = data.message;
+          //reject(res);
+          this.httpService.showNotification(Alarmtype.WARNING, data.message);
+        } else {
+          this.spyrecord = {
+            serialkey: data["Serialkey"],
+            servertime: data["Servertime"],
+            userid: data["Userid"],
+            jsondata: data["Jsondata"],
+            lat: data["Lat"],
+            lng: data["Lng"],
+          };
+        }
+
+        if (this.spyrecord !== undefined) {
+          //check that parsing is done ok
+          this.positions.push([this.spyrecord.lat, this.spyrecord.lng]);
+
+          this.googleMapObject.panTo(
+            new google.maps.LatLng({
+              lat: this.spyrecord.lat,
+              lng: this.spyrecord.lng,
+            })
+          );
+          this.googleMapObject.zoom = 18;
+        }
+      },
+      (error) => {
+        // error path
+        this.error = error;
+        this.httpService.showNotification(Alarmtype.DANGER, error);
+      },
+      () => {
+        console.log("http call finished");
+        console.log("spyrecord: " + this.spyrecord);
+        console.log("positions: " + this.positions);
+        console.log("error: " + this.error);
+      }
+    );
+  }
+
   showPathOfUserForTimePeriod(usersselected: string, pastHours: number) {
     this.clear();
 

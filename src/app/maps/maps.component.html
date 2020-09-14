@@ -61,12 +61,24 @@
     </div>
     <button
       class="btn btn-primary"
-      (click)="showLastSpyrecordForUser(search.value)"
+      (click)="sendCommandOnUserDevice(search.value, 'TRIGGER_LU')"
     >
-      Search
+      Find User
+    </button>
+    <button
+      class="btn btn-primary"
+      (click)="sendCommandOnUserDevice(search.value, 'START_TRACKING')"
+    >
+      Start Tracking User
+    </button>
+    <button
+      class="btn btn-primary"
+      (click)="sendCommandOnUserDevice(search.value, 'STOP_TRACKING')"
+    >
+      Stop Tracking User
     </button>
     <button class="btn btn-primary" (click)="clearMarkers()">
-      CLEAR MARKERS
+      CLEAR MARKERS ON MAP
     </button>
   </form>
 

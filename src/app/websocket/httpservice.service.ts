@@ -60,6 +60,22 @@ export class HttpService {
       );
   }
 
+  sendCommandOnUserDevice(userId: string, command: string) {
+    // our client app handles these commands (as keys in the message)
+	  //mMsgCommandTRIGGERLU := "TRIGGER_LU"
+	  //mMsgCommandSTARTTRACKING := "START_TRACKING"
+    //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
+  
+    return this.http
+      .get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/command/" + command, {
+        responseType: "json",
+      })
+      .pipe(
+        //retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
   getSpyrecordOfUserForTimePeriod(userId: string, pastHours: number) {
     return this.http
       .get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/tp/" + pastHours, {
