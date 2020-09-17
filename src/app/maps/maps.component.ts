@@ -107,8 +107,11 @@ export class MapsComponent implements OnInit, OnDestroy {
     );
   }
 
-  sendCommandOnUserDevice(userselected: string, command: string) {
+  sendCommandToUserDevice(userselected: string, command: string) {
     this.clear();
+
+    // show a notification so the user knows they have to wait a bit
+    this.httpService.showNotification(Alarmtype.INFO, "Wait for device to respond");
 
     // our client app handles these commands (as keys in the message)
 	  //mMsgCommandTRIGGERLU := "TRIGGER_LU"
@@ -117,7 +120,7 @@ export class MapsComponent implements OnInit, OnDestroy {
     // for triggering LU we expect to receive a spyrecord
     // for starting stopping tracking we expect to receive only an ack
     //TODO
-    this.httpService.sendCommandOnUserDevice(userselected, command).subscribe(
+    this.httpService.sendCommandToUserDevice(userselected, command).subscribe(
       (data: any) => {
         // success path
 
@@ -139,6 +142,7 @@ export class MapsComponent implements OnInit, OnDestroy {
         }
 
         if (this.spyrecord !== undefined) {
+          this.httpService.showNotification(Alarmtype.INFO, "Device found");
           //check that parsing is done ok
           this.positions.push([this.spyrecord.lat, this.spyrecord.lng]);
 

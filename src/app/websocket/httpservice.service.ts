@@ -9,6 +9,8 @@ import { getJSON } from "@ngui/map/services/util";
 import { environment } from '../../environments/environment';
 
 const URL_ENDPOINT = environment.endpointUrl;
+const URL_ENDPOINT_FIREBASESERVER = environment.firebaseServerEndpointUrl;
+
 declare var $: any;
 
 export enum Alarmtype {
@@ -60,14 +62,14 @@ export class HttpService {
       );
   }
 
-  sendCommandOnUserDevice(userId: string, command: string) {
+  sendCommandToUserDevice(userId: string, command: string) {
     // our client app handles these commands (as keys in the message)
 	  //mMsgCommandTRIGGERLU := "TRIGGER_LU"
 	  //mMsgCommandSTARTTRACKING := "START_TRACKING"
     //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
   
     return this.http
-      .get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/command/" + command, {
+      .get<Spyrecord>(URL_ENDPOINT_FIREBASESERVER + "user/" + userId + "/command/" + command, {
         responseType: "json",
       })
       .pipe(

@@ -50,6 +50,9 @@
       </div>
     </div>
   </div>
+  <p class="category">
+    Type OR Select a user id to perform additional functions
+  </p>
   <form class="form-inline">
     <div class="form-group">
       <input
@@ -58,22 +61,31 @@
         placeholder="Enter user id"
         #search
       />
+      OR
+      <select #user_selection>
+        <option value="">Choose user id</option>
+        <option *ngFor="let row of tableData1.dataRows" [ngValue]="row.userid">{{row.userid}}
+        </option>
+     </select>
     </div>
     <button
       class="btn btn-primary"
-      (click)="sendCommandOnUserDevice(search.value, 'TRIGGER_LU')"
+      *ngIf="search.value || user_selection.value as searchValue"
+      (click)="sendCommandToUserDevice(searchValue, 'TRIGGER_LU')"
     >
       Find User
     </button>
     <button
       class="btn btn-primary"
-      (click)="sendCommandOnUserDevice(search.value, 'START_TRACKING')"
+      *ngIf="search.value || user_selection.value as searchValue"
+      (click)="sendCommandToUserDevice(searchValue, 'START_TRACKING')"
     >
       Start Tracking User
     </button>
     <button
       class="btn btn-primary"
-      (click)="sendCommandOnUserDevice(search.value, 'STOP_TRACKING')"
+      *ngIf="search.value || user_selection.value as searchValue"
+      (click)="sendCommandToUserDevice(searchValue, 'STOP_TRACKING')"
     >
       Stop Tracking User
     </button>
