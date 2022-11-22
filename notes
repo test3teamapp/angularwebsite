@@ -1,0 +1,2 @@
+for angular > 17
+export NODE_OPTIONS=--openssl-legacy-provider

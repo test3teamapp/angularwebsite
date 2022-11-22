@@ -5,8 +5,11 @@
 
 export const environment = {
   production: false,
-  wsEndpoint: 'ws://localhost:8081/api/v1/ws',
-  firebaseServerEndpointUrl: 'https://127.0.0.1:8082/api/v1/',
-  endpointUrl: "https://127.0.0.1:8081/api/v1/",
+  //wsEndpoint: 'ws://localhost:8081/api/v1/ws',
+  //firebaseServerEndpointUrl: 'https://127.0.0.1:8082/api/v1/',
+  //endpointUrl: "https://127.0.0.1:8081/api/v1/",
+  wsEndpoint: 'ws://158.101.171.124:8081/api/v1/ws',
+  firebaseServerEndpointUrl: 'https://158.101.171.124:8082/api/v1/',
+  endpointUrl: "https://158.101.171.124:8081/api/v1/",
   reconnectInterval: 2000
 };
