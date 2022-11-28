@@ -1,2 +1,6 @@
-for angular > 17
+for angular > 14
 export NODE_OPTIONS=--openssl-legacy-provider
+
+
+// firebase deployment
+https://www.positronx.io/deploy-angular-app-to-production-with-firebase-hosting/
