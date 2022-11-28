@@ -1,6 +1,7 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import { ROUTES } from '../../sidebar/sidebar.component';
 import {Location, LocationStrategy, PathLocationStrategy} from '@angular/common';
+import { AccountService } from '../../_services/account.services';
 
 @Component({
     // moduleId: module.id,
@@ -13,10 +14,11 @@ export class NavbarComponent implements OnInit{
     location: Location;
     private toggleButton: any;
     private sidebarVisible: boolean;
+    
 
-    constructor(location: Location,  private element: ElementRef) {
+    constructor(location: Location,  private element: ElementRef, private accountService: AccountService) {
       this.location = location;
-          this.sidebarVisible = false;
+      this.sidebarVisible = false;      
     }
 
     ngOnInit(){
@@ -62,5 +64,9 @@ export class NavbarComponent implements OnInit{
           }
       }
       return 'Dashboard';
+    }
+
+    logoutUser(){
+        this.accountService.logout();
     }
 }

@@ -102,7 +102,7 @@ export class MapsComponent implements OnInit, OnDestroy {
         console.log("http call finished");
         console.log("spyrecord: " + this.spyrecord);
         console.log("positions: " + this.positions);
-        console.log("error: " + this.error);
+        console.log("showLastSpyrecordForUser : error: " + this.error);
       }
     );
   }
@@ -164,7 +164,7 @@ export class MapsComponent implements OnInit, OnDestroy {
         console.log("http call finished");
         console.log("spyrecord: " + this.spyrecord);
         console.log("positions: " + this.positions);
-        console.log("error: " + this.error);
+        console.log("sendCommandToUserDevice : error: " + this.error);
       }
     );
   }
@@ -253,7 +253,7 @@ export class MapsComponent implements OnInit, OnDestroy {
         () => {
           console.log("http call finished");
           console.log("table rows number: " + this.tableData1.dataRows.length);
-          console.log("error: " + this.error);
+          console.log("showPathOfUserForTimePeriod : error: " + this.error);
         }
       );
   }
@@ -292,7 +292,7 @@ export class MapsComponent implements OnInit, OnDestroy {
       () => {
         console.log("http call finished");
         console.log("table rows number: " + this.tableData1.dataRows.length);
-        console.log("error: " + this.error);
+        console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
       }
     );
   }
