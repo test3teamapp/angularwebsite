@@ -13,14 +13,14 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "12.2.17",
-    "@angular/common": "12.2.17",
-    "@angular/compiler": "12.2.17",
-    "@angular/core": "12.2.17",
-    "@angular/forms": "12.2.17",
-    "@angular/platform-browser": "12.2.17",
-    "@angular/platform-browser-dynamic": "12.2.17",
-    "@angular/router": "12.2.17",
+    "@angular/animations": "13.3.12",
+    "@angular/common": "13.3.12",
+    "@angular/compiler": "13.3.12",
+    "@angular/core": "13.3.12",
+    "@angular/forms": "13.3.12",
+    "@angular/platform-browser": "13.3.12",
+    "@angular/platform-browser-dynamic": "13.3.12",
+    "@angular/router": "13.3.12",
     "@ngui/map": "0.30.3",
     "@types/googlemaps": "3.39.3",
     "@types/socket.io-client": "^1.4.33",
@@ -43,9 +43,9 @@
     "zone.js": "0.11.8"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^12.2.18",
-    "@angular/cli": "^12.2.18",
-    "@angular/compiler-cli": "12.2.17",
+    "@angular-devkit/build-angular": "^13.3.10",
+    "@angular/cli": "^13.3.10",
+    "@angular/compiler-cli": "13.3.12",
     "@types/jasmine": "3.5.9",
     "@types/node": "13.9.0",
     "codelyzer": "5.2.1",
@@ -60,6 +60,6 @@
     "protractor": "~7.0.0",
     "ts-node": "8.6.2",
     "tslint": "~6.1.0",
-    "typescript": "4.3.5"
+    "typescript": "4.6.4"
   }
 }
