@@ -1,3 +1,5 @@
+##### MODIFIED TO FIT PURPOSE
+
 
 ### Installation of angular project after download: 
 Run "npm install", then you should be able to run "ng serve --open"
