@@ -37,7 +37,10 @@
         "rxjs-compat": "6.5.4",
         "socket.io": "^2.3.0",
         "socket.io-client": "^2.3.0",
-        "zone.js": "0.10.2"
+        "zone.js": "0.10.2",
+        "dotenv": "^16.0.0",
+        "redis": "^4.0.4",
+        "redis-om": "^0.2.0"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "0.900.6",
