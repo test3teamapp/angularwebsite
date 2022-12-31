@@ -4,9 +4,11 @@ import { map, catchError, tap, switchAll } from "rxjs/operators";
 import {
   Spyrecord,
   SpyrecordClass,
-  HttpService,
   Alarmtype
-} from "../_services/httpservice.service";
+} from "../_services/common";
+import {
+  RedisDBService
+} from "../_services/redisdb.service"
 import { NguiMapModule, NguiMapComponent } from "@ngui/map";
 import { HttpClient } from "@angular/common/http";
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
@@ -21,7 +23,7 @@ declare interface TableData {
   selector: "app-maps",
   templateUrl: "./maps.component.html",
   styleUrls: ["./maps.component.css"],
-  providers: [HttpService],
+  providers: [RedisDBService],
   styles: [".error {color: red;}"],
 })
 export class MapsComponent implements OnInit, OnDestroy {
@@ -42,7 +44,9 @@ export class MapsComponent implements OnInit, OnDestroy {
   //   tilt: 45
   // };
 
-  constructor(private httpService: HttpService, private http: HttpClient) {}
+  /// WE ONLY CHANGED THE THE TYPE OF THE httpService variable. to now be: RedisDBService
+  /// All methods are the same as the HttpService we use when the website calls directly the gospy api on the Oracle server
+  constructor(private httpService: RedisDBService, private http: HttpClient) { }
 
   clear() {
     //this.httpService = undefined;
@@ -114,8 +118,8 @@ export class MapsComponent implements OnInit, OnDestroy {
     this.httpService.showNotification(Alarmtype.INFO, "Wait for device to respond");
 
     // our client app handles these commands (as keys in the message)
-	  //mMsgCommandTRIGGERLU := "TRIGGER_LU"
-	  //mMsgCommandSTARTTRACKING := "START_TRACKING"
+    //mMsgCommandTRIGGERLU := "TRIGGER_LU"
+    //mMsgCommandSTARTTRACKING := "START_TRACKING"
     //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
     // for triggering LU we expect to receive a spyrecord
     // for starting stopping tracking we expect to receive only an ack
@@ -208,13 +212,13 @@ export class MapsComponent implements OnInit, OnDestroy {
               if (markerCounter == 0) {
                 routeMarkerImage = "/assets/img/start-flag-icon-0_64x64.png";
 
-              }else if (markerCounter == maxDataReceived - 1){
+              } else if (markerCounter == maxDataReceived - 1) {
                 routeMarkerImage = "/assets/img/flag-racing-png-2_64x64.png";
 
-              }else {
+              } else {
                 routeMarkerImage =
                   "https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png";
-              } 
+              }
 
               markerCounter++;
               routeMarker = new google.maps.Marker({
@@ -264,26 +268,17 @@ export class MapsComponent implements OnInit, OnDestroy {
     this.httpService.getLastSpyrecordsOfUsers(usersselected).subscribe(
       (data: any) => {
         // success path
-
-        if (data.message) {
-          // not the result we expected
-          console.log(" Response message: " + data.message);
-          this.error = data.message;
-          //reject(res);
-          this.httpService.showNotification(Alarmtype.WARNING, data.message);
-        } else {
-          this.tableData1.dataRows = data.map((item) => {
-            //console.log(item["Userid"]);
-            return new SpyrecordClass(
-              item["Serialkey"],
-              item["Servertime"],
-              item["Userid"],
-              item["Jsondata"],
-              item["Lat"],
-              item["Lng"]
-            );
-          });
-        }
+        this.tableData1.dataRows = data.map((item) => {
+          //console.log(item["Userid"]);
+          return new SpyrecordClass(
+            item["Serialkey"],
+            item["Servertime"],
+            item["Userid"],
+            item["Jsondata"],
+            item["Lat"],
+            item["Lng"]
+          );
+        });
       },
       (error) => {
         this.error = error;
@@ -326,5 +321,5 @@ export class MapsComponent implements OnInit, OnDestroy {
     this.getListOfLastSpyrecordsForAllUsers("all");
   }
 
-  ngOnDestroy() {}
+  ngOnDestroy() { }
 }

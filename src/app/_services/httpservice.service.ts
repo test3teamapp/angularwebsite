@@ -8,37 +8,17 @@ import "rxjs/add/operator/toPromise";
 import { getJSON } from "@ngui/map/services/util";
 import { environment } from '../../environments/environment';
 
+import {
+  Spyrecord,
+  SpyrecordClass,
+  Alarmtype
+} from "./common";
+
 const URL_ENDPOINT = environment.endpointUrl;
 const URL_ENDPOINT_FIREBASESERVER = environment.firebaseServerEndpointUrl;
 
 declare var $: any;
 
-export enum Alarmtype {
-  NONE = "",
-  INFO = "info",
-  SUCCESS =  "success",
-  WARNING =  "warning",
-  DANGER =  "danger"
-}
-
-export interface Spyrecord {
-  serialkey: number;
-  servertime: string;
-  userid: string;
-  jsondata: string;
-  lat: number;
-  lng: number;
-}
-export class SpyrecordClass {
-  constructor(
-    public serialkey: number,
-    public servertime: string,
-    public userid: string,
-    public jsondata: string,
-    public lat: number,
-    public lng: number
-  ) {}
-}
 
 @Injectable()
 export class HttpService {

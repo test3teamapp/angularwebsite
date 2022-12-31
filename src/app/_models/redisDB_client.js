@@ -16,4 +16,4 @@ const client = await new Client().use(connection)
 /* create and open the Redis OM Client - CAN USE IF CARE ONLY ABOUT OM  */
 //const client = await new Client().open(url)
 
-export default client
+export default redisDBclient
