@@ -5,8 +5,8 @@ import {
   Spyrecord,
   SpyrecordClass,
   HttpService,
-  Alarmtype,
-} from "../websocket/httpservice.service";
+  Alarmtype
+} from "../_services/httpservice.service";
 import { NguiMapModule, NguiMapComponent } from "@ngui/map";
 import { HttpClient } from "@angular/common/http";
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
