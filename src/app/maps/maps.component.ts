@@ -7,12 +7,13 @@ import {
   Alarmtype
 } from "../_services/common";
 import {
-  RedisDBService
-} from "../_services/redisdb.service"
+  HttpService
+} from "../_services/httpservice.service"
 import { NguiMapModule, NguiMapComponent } from "@ngui/map";
 import { HttpClient } from "@angular/common/http";
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
 import { isUndefined } from "util";
+import { jsonize } from "@ngui/map/services/util";
 
 declare interface TableData {
   headerRow: string[];
@@ -23,13 +24,13 @@ declare interface TableData {
   selector: "app-maps",
   templateUrl: "./maps.component.html",
   styleUrls: ["./maps.component.css"],
-  providers: [RedisDBService],
+  providers: [HttpService],
   styles: [".error {color: red;}"],
 })
 export class MapsComponent implements OnInit, OnDestroy {
   error: any;
   headers: string[];
-  spyrecord: Spyrecord;
+  spyrecord: SpyrecordClass;
   positions = [];
   //map: NguiMapComponent;
   //changes: SimpleChanges;
@@ -46,7 +47,7 @@ export class MapsComponent implements OnInit, OnDestroy {
 
   /// WE ONLY CHANGED THE THE TYPE OF THE httpService variable. to now be: RedisDBService
   /// All methods are the same as the HttpService we use when the website calls directly the gospy api on the Oracle server
-  constructor(private httpService: RedisDBService, private http: HttpClient) { }
+  constructor(private httpService: HttpService, private http: HttpClient) { }
 
   clear() {
     //this.httpService = undefined;
@@ -74,18 +75,24 @@ export class MapsComponent implements OnInit, OnDestroy {
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.message);
         } else {
-          this.spyrecord = {
-            serialkey: data["Serialkey"],
-            servertime: data["Servertime"],
-            userid: data["Userid"],
-            jsondata: data["Jsondata"],
-            lat: data["Lat"],
-            lng: data["Lng"],
-          };
+          //debug
+          //console.log("data received for user : " + userselected + " = " + JSON.stringify(data));
+          this.spyrecord = new SpyrecordClass(
+              1,
+              data[0]["locationUpdated"],
+              data[0]["name"],
+              '{}',
+              data[0]["location"]["latitude"],
+              data[0]["location"]["longitude"]
+            );
+          //debug
+          //console.log("spyrecord to display for user : " + userselected + " = " + JSON.stringify(this.spyrecord));
         }
-
+        
         if (this.spyrecord !== undefined) {
           //check that parsing is done ok
+          //debug
+          //console.log("last known position for user : " + userselected + " = " + this.spyrecord.lat + "," + this.spyrecord.lng);
           this.positions.push([this.spyrecord.lat, this.spyrecord.lng]);
 
           this.googleMapObject.panTo(
@@ -104,7 +111,7 @@ export class MapsComponent implements OnInit, OnDestroy {
       },
       () => {
         console.log("http call finished");
-        console.log("spyrecord: " + this.spyrecord);
+        console.log("spyrecord: " + JSON.stringify(this.spyrecord));
         console.log("positions: " + this.positions);
         console.log("showLastSpyrecordForUser : error: " + this.error);
       }
@@ -135,14 +142,14 @@ export class MapsComponent implements OnInit, OnDestroy {
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.message);
         } else {
-          this.spyrecord = {
-            serialkey: data["Serialkey"],
-            servertime: data["Servertime"],
-            userid: data["Userid"],
-            jsondata: data["Jsondata"],
-            lat: data["Lat"],
-            lng: data["Lng"],
-          };
+          this.spyrecord = new SpyrecordClass(
+            1,
+            data[0]["locationUpdated"],
+            data[0]["name"],
+            '{}',
+            data[0]["location"]["latitude"],
+            data[0]["location"]["longitude"]
+          );
         }
 
         if (this.spyrecord !== undefined) {
@@ -268,15 +275,17 @@ export class MapsComponent implements OnInit, OnDestroy {
     this.httpService.getLastSpyrecordsOfUsers(usersselected).subscribe(
       (data: any) => {
         // success path
+        let i = 0;
         this.tableData1.dataRows = data.map((item) => {
-          //console.log(item["Userid"]);
+          //console.log(item);
+          i++;
           return new SpyrecordClass(
-            item["Serialkey"],
-            item["Servertime"],
-            item["Userid"],
-            item["Jsondata"],
-            item["Lat"],
-            item["Lng"]
+            i,
+            item["locationUpdated"],
+            item["name"],
+            '{}',
+            item["location"]["latitude"],
+            item["location"]["longitude"]
           );
         });
       },

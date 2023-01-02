@@ -33,7 +33,8 @@ export class HttpService {
 
   getLastSpyrecordOfUser(userId: string) {
     return this.http
-      .get<Spyrecord>(URL_ENDPOINT + "user/" + userId, {
+      //.get<Spyrecord>(URL_ENDPOINT + "user/" + userId, {
+      .get("http://localhost:8084/persons/by-name/" + userId, {
         responseType: "json",
       })
       .pipe(
@@ -71,7 +72,8 @@ export class HttpService {
 
   getLastSpyrecordsOfUsers(userIds: string) {
     return this.http
-      .get(URL_ENDPOINT + "users/" + userIds, {
+      //.get(URL_ENDPOINT + "users/" + userIds, {
+        .get("http://localhost:8084/persons/all",{
         responseType: "json",
       })
       .pipe(
