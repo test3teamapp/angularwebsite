@@ -1,3 +1,6 @@
 docker run -v /local-data/:/data -p 6379:6379 -p 8001:8001 redis/redis-stack:latest &
 
 export NODE_OPTIONS=--openssl-legacy-provider
+
+nohup 2>&1 npm start &
+

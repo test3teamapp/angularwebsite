@@ -38,6 +38,8 @@ export class MapsComponent implements OnInit, OnDestroy {
 
   public tableData1: TableData;
 
+  maxTrackDataReceived : number;
+
   // allOptions = {
   //   center: {lat: 36.964, lng: -122.015},
   //   zoom: 18,
@@ -68,12 +70,12 @@ export class MapsComponent implements OnInit, OnDestroy {
       (data: any) => {
         // success path
 
-        if (data.message) {
+        if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.message);
-          this.error = data.message;
+          console.log(" Response message: " + data.ERROR);
+          this.error = data.ERROR;
           //reject(res);
-          this.httpService.showNotification(Alarmtype.WARNING, data.message);
+          this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
         } else {
           //debug
           //console.log("data received for user : " + userselected + " = " + JSON.stringify(data));
@@ -118,11 +120,27 @@ export class MapsComponent implements OnInit, OnDestroy {
     );
   }
 
+  // will return :
+  /*
+  {
+  "name": "samsungj5",
+  "message": [
+    "1672876442623-0",
+    [
+      "longitude",
+      "21.7267733",
+      "latitude",
+      "38.2336"
+    ]
+  ]
+  }
+  */
+
   sendCommandToUserDevice(userselected: string, command: string) {
     this.clear();
 
     // show a notification so the user knows they have to wait a bit
-    this.httpService.showNotification(Alarmtype.INFO, "Wait for device to respond");
+    this.httpService.showNotification(Alarmtype.INFO, "Wait for device " + userselected + " to respond");
 
     // our client app handles these commands (as keys in the message)
     //mMsgCommandTRIGGERLU := "TRIGGER_LU"
@@ -135,25 +153,30 @@ export class MapsComponent implements OnInit, OnDestroy {
       (data: any) => {
         // success path
 
-        if (data.message) {
+        if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.message);
-          this.error = data.message;
-          //reject(res);
-          this.httpService.showNotification(Alarmtype.WARNING, data.message);
+          console.log(" Response message: " + data.ERROR);
+          this.error = data.ERROR;
+          this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
+        }else if (data.command) {
+          // not the result we expected
+          console.log("Command " + data.command + " sent to device " + data.name);
+          this.httpService.showNotification(Alarmtype.SUCCESS, "Command " + data.command + " sent to device " + data.name);
         } else {
+          const dateFromMs = new Date(Number(String(data.message[0]).substring(0,13)));
+
           this.spyrecord = new SpyrecordClass(
             1,
-            data[0]["locationUpdated"],
-            data[0]["name"],
+            dateFromMs.toString(),
+            data.name,
             '{}',
-            data[0]["location"]["latitude"],
-            data[0]["location"]["longitude"]
+            Number(data.message[1][3]),
+            Number(data.message[1][1])
           );
         }
 
         if (this.spyrecord !== undefined) {
-          this.httpService.showNotification(Alarmtype.INFO, "Device found");
+          this.httpService.showNotification(Alarmtype.SUCCESS, "Device " + userselected +" found");
           //check that parsing is done ok
           this.positions.push([this.spyrecord.lat, this.spyrecord.lng]);
 
@@ -180,6 +203,33 @@ export class MapsComponent implements OnInit, OnDestroy {
     );
   }
 
+  /*
+From redis , the data comes in this form:
+{
+  "name": "xiaominote8T",
+  "tracks": [
+    [
+      "1672482216758-0",
+      [
+        "longitude",
+        "38.2333814",
+        "latitude",
+        "21.7266567"
+      ]
+    ],
+    [
+      "1672482264410-0",
+      [
+        "longitude",
+        "38.2332271",
+        "latitude",
+        "21.7268586"
+      ]
+    ]
+  ]
+}
+  */
+
   showPathOfUserForTimePeriod(usersselected: string, pastHours: number) {
     this.clear();
 
@@ -189,37 +239,51 @@ export class MapsComponent implements OnInit, OnDestroy {
         (data: any) => {
           // success path
 
-          if (data.message) {
+          if (data.ERROR) {
             // not the result we expected
-            console.log(" Response message: " + data.message);
-            this.error = data.message;
+            console.log(" Response message: " + data.ERROR);
+            this.error = data.ERROR;
             //reject(res);
-            this.httpService.showNotification(Alarmtype.WARNING, data.message);
-          } else {
+            this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
+          } else {   
+            //console.log(`data.tracks : ${data.tracks}`)  
+            //console.log(`data.tracks.length : ${data.tracks.length}`)  
+            //console.log(`data.tracks[0] : ${data.tracks[0]}`)   
+            //console.log(`data.tracks[0][0] : ${data.tracks[0][0]}`)
+            //console.log(`data.tracks[0][1] : ${data.tracks[0][1]}`)
+            //console.log(`data.tracks[0][1][1] : ${data.tracks[0][1][1]}`)
+            //console.log(`data.tracks[0][1][3] : ${data.tracks[0][1][3]}`)
+
             var flightPlanCoordinates = [];
             var flightPlanPositions = [];
             var markerCounter = 0;
-            var maxDataReceived = 0;
+            this.maxTrackDataReceived = 0;
             var routeMarkerImage;
             var routeMarker;
 
-            data.map((item) => {
-              maxDataReceived++;
-            });
+            this.maxTrackDataReceived = data.tracks.length;
 
-            data.map((item) => {
+            if (this.maxTrackDataReceived < 2){
+              this.httpService.showNotification(
+                Alarmtype.INFO,
+                "Not enough data for path construction."
+              );
+              return
+            }
+
+            data.tracks.map((item) => {
               //console.log(item["Userid"]);
               flightPlanCoordinates.push(
                 new google.maps.LatLng({
-                  lat: item["Lat"],
-                  lng: item["Lng"],
+                  lat: Number(item[1][3]),
+                  lng: Number(item[1][1]),
                 })
               );
               var image;
               if (markerCounter == 0) {
                 routeMarkerImage = "/assets/img/start-flag-icon-0_64x64.png";
 
-              } else if (markerCounter == maxDataReceived - 1) {
+              } else if (markerCounter == (this.maxTrackDataReceived - 1)) {
                 routeMarkerImage = "/assets/img/flag-racing-png-2_64x64.png";
 
               } else {
@@ -228,11 +292,12 @@ export class MapsComponent implements OnInit, OnDestroy {
               }
 
               markerCounter++;
+              const dateFromMs = new Date(Number(String(item[0]).substring(0,13)));
               routeMarker = new google.maps.Marker({
-                position: { lat: item["Lat"], lng: item["Lng"] },
+                position: { lat: Number(item[1][3]), lng: Number(item[1][1]) },
                 map: this.googleMapObject,
                 icon: routeMarkerImage,
-                title: item["Servertime"],
+                title: dateFromMs.toString(),
               });
             });
 
@@ -263,7 +328,7 @@ export class MapsComponent implements OnInit, OnDestroy {
         }, // error path
         () => {
           console.log("http call finished");
-          console.log("table rows number: " + this.tableData1.dataRows.length);
+          console.log("track locations received: " + this.maxTrackDataReceived);
           console.log("showPathOfUserForTimePeriod : error: " + this.error);
         }
       );

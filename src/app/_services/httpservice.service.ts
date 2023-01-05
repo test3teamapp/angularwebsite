@@ -16,6 +16,7 @@ import {
 
 const URL_ENDPOINT = environment.endpointUrl;
 const URL_ENDPOINT_FIREBASESERVER = environment.firebaseServerEndpointUrl;
+const REDIS_API_ENDPOINT = environment.redisapiEndpoint;
 
 declare var $: any;
 
@@ -34,7 +35,7 @@ export class HttpService {
   getLastSpyrecordOfUser(userId: string) {
     return this.http
       //.get<Spyrecord>(URL_ENDPOINT + "user/" + userId, {
-      .get("http://localhost:8084/persons/by-name/" + userId, {
+      .get(REDIS_API_ENDPOINT +"/persons/by-name/" + userId, {
         responseType: "json",
       })
       .pipe(
@@ -50,7 +51,8 @@ export class HttpService {
     //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
   
     return this.http
-      .get<Spyrecord>(URL_ENDPOINT_FIREBASESERVER + "user/" + userId + "/command/" + command, {
+      //.get<Spyrecord>(URL_ENDPOINT_FIREBASESERVER + "user/" + userId + "/command/" + command, {
+      .get(REDIS_API_ENDPOINT +"/sendCommand/byName/" + userId + "/command/" + command, {
         responseType: "json",
       })
       .pipe(
@@ -61,7 +63,8 @@ export class HttpService {
 
   getSpyrecordOfUserForTimePeriod(userId: string, pastHours: number) {
     return this.http
-      .get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/tp/" + pastHours, {
+      //.get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/tp/" + pastHours, {
+      .get(REDIS_API_ENDPOINT + "/tracking/byName/" + userId + "/hours/" + pastHours, {
         responseType: "json",
       })
       .pipe(
@@ -73,7 +76,7 @@ export class HttpService {
   getLastSpyrecordsOfUsers(userIds: string) {
     return this.http
       //.get(URL_ENDPOINT + "users/" + userIds, {
-        .get("http://localhost:8084/persons/all",{
+        .get(REDIS_API_ENDPOINT + "/persons/all",{
         responseType: "json",
       })
       .pipe(
