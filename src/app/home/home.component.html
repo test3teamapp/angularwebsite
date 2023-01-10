@@ -1,5 +1,50 @@
 <div class="main-content">
     <div class="container-fluid">
+        <div class="col-md-12">
+        <div class="row">                 
+                    <form class="form-inline">
+                      <div class="form-group">
+                        <select #user_selection>
+                          <option value="">Choose user id</option>
+                          <option *ngFor="let row of tableData.dataRows" [ngValue]="row.userid">{{row.userid}}
+                          </option>
+                        </select>
+                      </div>
+                      <button class="btn btn-primary" 
+                        (click)="getMeetingDataForUser(user_selection.value)"> 
+                        Show last meeting
+                      </button>
+                    </form>
+                  </div> 
+        </div>
+        <div class="row">   
+            <div class="col-md-6">          
+                <lbd-graph
+                  [title]="'User Meeting'"
+                  [subtitle]="'latest in 24 Hours'"
+                  [tableData]="tableData"
+                  [graphData]="graphData"
+                  [legendItems]="hoursChartLegendItems"
+                  [withHr]="true"
+                  [footerIconClass]="'fa fa-history'"
+                  [footerText]="graphFooterTimeText">
+                </lbd-graph>
+            </div>
+            <div class="col-md-6">
+                <lbd-chart
+                  [title]="'Users Behavior'"
+                  [subtitle]="'24 Hours performance'"
+                  [chartType]="hoursChartType"
+                  [chartData]="hoursChartData"
+                  [chartOptions]="hoursChartOptions"
+                  [chartResponsive]="hoursChartResponsive"
+                  [legendItems]="hoursChartLegendItems"
+                  [withHr]="true"
+                  [footerIconClass]="'fa fa-history'"
+                  [footerText]="'Updated 3 minutes ago'">
+                </lbd-chart>
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-4">
                 <lbd-chart

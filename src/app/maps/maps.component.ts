@@ -4,7 +4,8 @@ import { map, catchError, tap, switchAll } from "rxjs/operators";
 import {
   Spyrecord,
   SpyrecordClass,
-  Alarmtype
+  Alarmtype,
+  TableData
 } from "../_services/common";
 import {
   HttpService
@@ -14,11 +15,6 @@ import { HttpClient } from "@angular/common/http";
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
 import { isUndefined } from "util";
 import { jsonize } from "@ngui/map/services/util";
-
-declare interface TableData {
-  headerRow: string[];
-  dataRows: SpyrecordClass[];
-}
 
 @Component({
   selector: "app-maps",
@@ -47,8 +43,10 @@ export class MapsComponent implements OnInit, OnDestroy {
   //   tilt: 45
   // };
 
-  /// WE ONLY CHANGED THE THE TYPE OF THE httpService variable. to now be: RedisDBService
-  /// All methods are the same as the HttpService we use when the website calls directly the gospy api on the Oracle server
+  /// thransition to redis db
+  /// All methods are the same (in name and function, although return data are slightly different
+  // and needed different handling)
+  // as with the HttpService we use when the website calls directly the gospy api on the Oracle server
   constructor(private httpService: HttpService, private http: HttpClient) { }
 
   clear() {

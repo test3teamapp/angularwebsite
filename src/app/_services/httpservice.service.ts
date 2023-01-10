@@ -23,7 +23,7 @@ declare var $: any;
 
 @Injectable()
 export class HttpService {
- 
+
   results: SpyrecordClass[];
   loading: boolean;
 
@@ -35,7 +35,7 @@ export class HttpService {
   getLastSpyrecordOfUser(userId: string) {
     return this.http
       //.get<Spyrecord>(URL_ENDPOINT + "user/" + userId, {
-      .get(REDIS_API_ENDPOINT +"/persons/by-name/" + userId, {
+      .get(REDIS_API_ENDPOINT + "/persons/by-name/" + userId, {
         responseType: "json",
       })
       .pipe(
@@ -46,13 +46,13 @@ export class HttpService {
 
   sendCommandToUserDevice(userId: string, command: string) {
     // our client app handles these commands (as keys in the message)
-	  //mMsgCommandTRIGGERLU := "TRIGGER_LU"
-	  //mMsgCommandSTARTTRACKING := "START_TRACKING"
+    //mMsgCommandTRIGGERLU := "TRIGGER_LU"
+    //mMsgCommandSTARTTRACKING := "START_TRACKING"
     //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
-  
+
     return this.http
       //.get<Spyrecord>(URL_ENDPOINT_FIREBASESERVER + "user/" + userId + "/command/" + command, {
-      .get(REDIS_API_ENDPOINT +"/sendCommand/byName/" + userId + "/command/" + command, {
+      .get(REDIS_API_ENDPOINT + "/sendCommand/byName/" + userId + "/command/" + command, {
         responseType: "json",
       })
       .pipe(
@@ -76,7 +76,20 @@ export class HttpService {
   getLastSpyrecordsOfUsers(userIds: string) {
     return this.http
       //.get(URL_ENDPOINT + "users/" + userIds, {
-        .get(REDIS_API_ENDPOINT + "/persons/all",{
+      .get(REDIS_API_ENDPOINT + "/persons/all", {
+        responseType: "json",
+      })
+      .pipe(
+        //retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
+  getMeetingDataForUser(userId: string) {
+    console.log("getMeetingDataForUser:", userId);
+    return this.http
+      //.get(URL_ENDPOINT + "users/" + userIds, {
+      .get(REDIS_API_ENDPOINT + "/graph/latest/byName/" + userId + "/hours/24", {
         responseType: "json",
       })
       .pipe(

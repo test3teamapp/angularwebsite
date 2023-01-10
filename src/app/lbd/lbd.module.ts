@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { LbdChartComponent } from './lbd-chart/lbd-chart.component';
+import { LbdGraphComponent } from './lbd-chart/lbd-graph.component';
 
 @NgModule({
   imports: [
@@ -12,11 +13,13 @@ import { LbdChartComponent } from './lbd-chart/lbd-chart.component';
   ],
   declarations: [
 
-    LbdChartComponent
+    LbdChartComponent,
+    LbdGraphComponent
 
   ],
   exports: [
-    LbdChartComponent
+    LbdChartComponent,
+    LbdGraphComponent
   ]
 })
 export class LbdModule { }
