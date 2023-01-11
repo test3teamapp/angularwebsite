@@ -107,7 +107,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             data.graphResult.data[0].allp.forEach(p => {
               tempGraphData.people.push({id: p.id, name: p.properties.name});
             });
-            tempGraphData.meeting = {id: data.graphResult.data[0].m.id, date: data.graphResult.data[0].m.stringDate};
+          
+            tempGraphData.meeting = {id: data.graphResult.data[0].m.id, date: data.graphResult.data[0].m.properties.stringDate};
             tempGraphData.place = {
               id: data.graphResult.data[0].pl.id, 
               name: data.graphResult.data[0].pl.properties.name,

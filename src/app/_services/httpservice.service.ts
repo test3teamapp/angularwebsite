@@ -116,7 +116,7 @@ export class HttpService {
     return throwError(erroMsg);
   }
 
-  showNotification(alarmtype, msg) {
+  showNotification(alarmtype:Alarmtype, msg:string) {
 
     //var color = Math.floor(Math.random() * 4 + 1);
     $.notify(

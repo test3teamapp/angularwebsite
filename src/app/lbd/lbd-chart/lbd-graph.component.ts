@@ -19,6 +19,7 @@ import {
 export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
   static currentId = 1;
   error: any;
+  graph = Viva.Graph.graph();
 
   @Input()
   public title: string;
@@ -56,19 +57,58 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   public drawGraph() {
-    var graph = Viva.Graph.graph();
+
+    this.graph.clear();
+    // remove any svg element in the container that has been created previously
+    var e = document.getElementById(this.graphId)
+
+    var child = e.lastElementChild;
+    while (child) {
+      e.removeChild(child);
+      child = e.lastElementChild;
+    }
 
     if (this.graphData.people.length != 0) {
-      graph.addNode(this.graphData.place.id, this.graphData.place.name);
-      graph.addNode(this.graphData.meeting.id, this.graphData.meeting.date);
-      graph.addLink(this.graphData.place.id, this.graphData.meeting.id);
+
+      var graphics = Viva.Graph.View.svgGraphics(),
+        nodeSize = 24;
+
+      const strTrimmedDate = this.graphData.meeting.date.replace('(Coordinated Universal Time)', '');
+      // use ` to have a new line in the label of the Place node, including the date
+      this.graph.addNode(this.graphData.place.id, `${this.graphData.place.name} \n
+        @ ${strTrimmedDate}`);
+      //tempGraph.addNode(this.graphData.meeting.id, this.graphData.meeting.date);
+      //tempGraph.addLink(this.graphData.place.id, this.graphData.meeting.id);
       this.graphData.people.forEach(p => {
-        graph.addNode(p.name, p.name);
-        graph.addLink(p.name, this.graphData.meeting.id);
+        this.graph.addNode(p.name, p.name);
+        this.graph.addLink(p.name, this.graphData.place.id);
+      });
+
+      graphics.node(function (node) {
+        // This time it's a group of elements: http://www.w3.org/TR/SVG/struct.html#Groups
+        var ui = Viva.Graph.svg('g'),
+          // Create SVG text element with user id as content
+          svgText = Viva.Graph.svg('text').attr('y', '-4px').text(node.data),
+          rect = Viva.Graph.svg('rect')
+            .attr('width', nodeSize)
+            .attr('height', nodeSize)
+            .attr("fill", "#00a2e8");
+
+        ui.append(rect);
+        ui.append(svgText);
+        return ui;
+      }).placeNode(function (nodeUI, pos) {
+        // 'g' element doesn't have convenient (x,y) attributes, instead
+        // we have to deal with transforms: http://www.w3.org/TR/SVG/coords.html#SVGGlobalTransformAttribute
+        nodeUI.attr('transform',
+          'translate(' +
+          (pos.x - nodeSize / 2) + ',' + (pos.y - nodeSize / 2) +
+          ')');
       });
 
       // specify where it should be rendered:
-      var renderer = Viva.Graph.View.renderer(graph, {
+      var renderer = Viva.Graph.View.renderer(this.graph, {
+        graphics: graphics,
         container: document.getElementById(this.graphId)
       });
       renderer.run();
