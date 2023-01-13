@@ -1,6 +1,6 @@
 <div class="main-content">
     <div class="container-fluid">
-        <div class="col-md-12">
+        <div class="col-md-6">
         <div class="row">                 
                     <form class="form-inline">
                       <div class="form-group">
@@ -10,21 +10,57 @@
                           </option>
                         </select>
                       </div>
+                      past hours
+                      <select #hours>
+                        <option value=6>6</option>
+                        <option value=12>12</option>
+                        <option value=24>24</option>
+                        <option value=48>48</option>
+                        <option value=72>72</option>
+                        <option value=144>144</option>
+                      </select>
+                        
                       <button class="btn btn-primary" 
-                        (click)="getMeetingDataForUser(user_selection.value)"> 
+                        (click)="getMeetingDataForUser(user_selection.value, hours.value)"> 
                         Show last meeting
                       </button>
                     </form>
                   </div> 
         </div>
+        <div class="col-md-6">
+            <div class="row">                 
+                        <form class="form-inline">
+                          <div class="form-group">
+                            <select #places_user_selection>
+                              <option value="">Choose user id</option>
+                              <option *ngFor="let row of tableData.dataRows" [ngValue]="row.userid">{{row.userid}}
+                              </option>
+                            </select>
+                          </div>
+                          past months
+                          <select #places_months>
+                            <option value=1>1</option>
+                            <option value=2>2</option>
+                            <option value=4>4</option>
+                            <option value=8>8</option>
+                            <option value=12>12</option>
+                          </select>
+                            
+                          <button class="btn btn-primary" 
+                            (click)="getPlacesOfMeetingsForUser(places_user_selection.value, places_months.value)"> 
+                            Show meeting places
+                          </button>
+                        </form>
+                      </div> 
+            </div>
         <div class="row">   
             <div class="col-md-6">          
                 <lbd-graph
                   [title]="'User Meeting'"
-                  [subtitle]="'latest in 24 Hours'"
+                  [subtitle]="graphSubtitleText"
                   [tableData]="tableData"
                   [graphData]="graphData"
-                  [legendItems]="hoursChartLegendItems"
+                  [legendItems]="meetingGraphLegendItems"
                   [withHr]="true"
                   [footerIconClass]="'fa fa-history'"
                   [footerText]="graphFooterTimeText">
@@ -32,199 +68,45 @@
             </div>
             <div class="col-md-6">
                 <lbd-chart
-                  [title]="'Users Behavior'"
-                  [subtitle]="'24 Hours performance'"
-                  [chartType]="hoursChartType"
-                  [chartData]="hoursChartData"
-                  [chartOptions]="hoursChartOptions"
-                  [chartResponsive]="hoursChartResponsive"
-                  [legendItems]="hoursChartLegendItems"
-                  [withHr]="true"
-                  [footerIconClass]="'fa fa-history'"
-                  [footerText]="'Updated 3 minutes ago'">
-                </lbd-chart>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <lbd-chart
-                  [title]="'Email Statistics'"
-                  [subtitle]="'Last Campaign Performance'"
+                  [title]="'User Meeting Places'"
+                  [subtitle]="placesSubtitleText"
                   [chartClass]="'ct-perfect-fourth'"
-                  [chartType]="emailChartType"
-                  [chartData]="emailChartData"
-                  [legendItems]="emailChartLegendItems"
-                  [withHr]="true"
-                  [footerIconClass]="'fa fa-clock-o'"
-                  [footerText]="'Campaign sent 2 days ago'">
-                </lbd-chart>
-            </div>
-            <div class="col-md-8">
-                <lbd-chart
-                  [title]="'Users Behavior'"
-                  [subtitle]="'24 Hours performance'"
-                  [chartType]="hoursChartType"
-                  [chartData]="hoursChartData"
-                  [chartOptions]="hoursChartOptions"
-                  [chartResponsive]="hoursChartResponsive"
-                  [legendItems]="hoursChartLegendItems"
+                  [chartType]="placesChartType"
+                  [chartData]="placesChartData"
                   [withHr]="true"
                   [footerIconClass]="'fa fa-history'"
-                  [footerText]="'Updated 3 minutes ago'">
+                  [footerText]="placesFooterText">
                 </lbd-chart>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <lbd-chart
-                  [title]="'2014 Sales'"
-                  [subtitle]="'All products including Taxes'"
-                  [chartType]="activityChartType"
-                  [chartData]="activityChartData"
-                  [chartOptions]="activityChartOptions"
-                  [chartResponsive]="activityChartResponsive"
-                  [legendItems]="activityChartLegendItems"
-                  [withHr]="true"
-                  [footerIconClass]="'fa fa-check'"
-                  [footerText]="'Data information certified'">
-                </lbd-chart>
+        <div class="col-md-6">
+            <div class="row">                 
+                        <form class="form-inline">
+                          <div class="form-group">
+                            <select #friends_user_selection>
+                              <option value="">Choose user id</option>
+                              <option *ngFor="let row of tableData.dataRows" [ngValue]="row.userid">{{row.userid}}
+                              </option>
+                            </select>
+                          </div>                                                      
+                          <button class="btn btn-primary" 
+                            (click)="getFriendsOfFriendsGraphTree(friends_user_selection.value)"> 
+                            Show friends and FoF
+                          </button>
+                        </form>
+                      </div> 
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="header">
-                        <h4 class="title">Tasks</h4>
-                        <p class="category">Backend development</p>
-                    </div>
-                    <div class="content">
-                        <div class="table-full-width">
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox">
-                                                <input id="checkbox1" type="checkbox">
-                                                <label for="checkbox1">
-
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>Sign contract for "What are conference organizers afraid of?"</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox">
-                                                <input id="checkbox2" type="checkbox" checked>
-                                                <label for="checkbox2">
-
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox">
-                                                <input id="checkbox3" type="checkbox" checked>
-                                                <label for="checkbox3">
-
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
-                                        </td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox">
-                                                <input id="checkbox4" type="checkbox">
-                                                <label for="checkbox4">
-
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>Create 4 Invisible User Experiences you Never Knew About</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox">
-                                                <input id="checkbox5" type="checkbox" >
-                                                <label for="checkbox5">
-
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>Read "Following makes Medium better"</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="checkbox">
-                                                <input id="checkbox6" type="checkbox">
-                                                <label for="checkbox6">
-
-                                                </label>
-                                            </div>
-                                        </td>
-                                        <td>Unfollow 5 enemies from twitter</td>
-                                        <td class="td-actions text-right">
-                                            <button type="button" rel="tooltip" title="Edit Task" class="btn btn-info btn-simple btn-xs">
-                                                <i class="fa fa-edit"></i>
-                                            </button>
-                                            <button type="button" rel="tooltip" title="Remove" class="btn btn-danger btn-simple btn-xs">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="footer">
-                            <hr>
-                            <div class="stats">
-                                <i class="fa fa-history"></i> Updated 3 minutes ago
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="row">
+            <div class="col-md-12">
+                <lbd-tree-graph
+                [title]="'Friends'"
+                [subtitle]="fofGraphTreeSubtitleText"
+                [tableData]="tableData"
+                [graphData]="fofGraphTreeData"
+                [withHr]="true"
+                [footerIconClass]="'fa fa-history'"
+                [footerText]="fofGraphTreeFooterText">
+              </lbd-tree-graph>
             </div>
         </div>
     </div>

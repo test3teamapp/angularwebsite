@@ -1,5 +1,4 @@
 import { Component, Input, OnInit, AfterViewInit, ChangeDetectionStrategy, OnChanges, SimpleChanges } from '@angular/core';
-import * as Chartist from 'chartist';
 import { LegendItem } from './lbd-chart.component';
 import * as Viva from 'vivagraphjs';
 
@@ -8,15 +7,16 @@ import {
   GraphData,
   GraphPerson,
   GraphMeeting,
-  GraphPlace
+  GraphPlace,
+  GraphTreeData
 } from "../../_services/common";
 
 @Component({
-  selector: 'lbd-graph',
-  templateUrl: './lbd-graph.component.html',
+  selector: 'lbd-tree-graph',
+  templateUrl: './lbd-tree-graph.component.html',
   changeDetection: ChangeDetectionStrategy.Default
 })
-export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
+export class LbdTreeGraphComponent implements OnInit, AfterViewInit, OnChanges {
   static currentId = 1;
   static colorLightblue = "#1DC7EA";
   static colorRed = "#FF4A55";
@@ -32,7 +32,7 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
   public subtitle: string;
 
   @Input()
-  public graphData: GraphData;
+  public graphData: GraphTreeData;
 
   @Input()
   public tableData: TableData;
@@ -55,7 +55,7 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    //console.log(" changes detected : " + JSON.stringify(changes));
+    console.log(" changes detected : " + JSON.stringify(changes));
     this.drawGraph();
     //throw new Error('Method not implemented.');
   }
@@ -74,30 +74,33 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
       }
     }
 
-    if (this.graphData.people.length != 0) {
+    if (this.graphData.friends.length != 0) {
 
       const nameInRequest = this.graphData.name;
-      const placeId = this.graphData.place.id;
 
       var graphics = Viva.Graph.View.svgGraphics(),
-        nodeSize = 24;
+        nodeSize = 12;
 
-      const strTrimmedDate = this.graphData.meeting.date.replace('(Coordinated Universal Time)', '');
-
-      this.graph.addNode(this.graphData.place.id, `${this.graphData.place.name}`);
-      //tempGraph.addNode(this.graphData.meeting.id, this.graphData.meeting.date);
-      //tempGraph.addLink(this.graphData.place.id, this.graphData.meeting.id);
-      this.graphData.people.forEach(p => {
-        this.graph.addNode(p.name, p.name);
-        this.graph.addLink(p.name, this.graphData.place.id);
+      this.graph.addNode(this.graphData.name, this.graphData.name);
+      this.graphData.friends.forEach(p => { // there are strings
+        this.graph.addNode(p, p);
+        this.graph.addLink(p, this.graphData.name);
+      });
+      // do Friend of friend
+      this.graphData.links.forEach(p => { // there are {}
+        if ( ! this.graph.getNode(p.friend) ){
+          this.graph.addNode(p.friend, p.friend);
+        }
+        if ( ! this.graph.getNode(p.fof) ){
+          this.graph.addNode(p.fof, p.fof);
+        }
+        this.graph.addLink(p.friend, p.fof);
       });
 
       graphics.node(function (node) {
-        let colorOfNode = LbdGraphComponent.colorLightblue;
+        let colorOfNode = LbdTreeGraphComponent.colorLightblue;
         if (node.id === nameInRequest) {
-          colorOfNode = LbdGraphComponent.colorOrange;
-        } else if (node.id == placeId) {
-          colorOfNode = LbdGraphComponent.colorRed;
+          colorOfNode = LbdTreeGraphComponent.colorOrange;
         }
         // This time it's a group of elements: http://www.w3.org/TR/SVG/struct.html#Groups
         var ui = Viva.Graph.svg('g'),
@@ -126,20 +129,19 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
         container: document.getElementById(this.graphId)
       });
       renderer.run();
-      // add time in footer
-      this.footerText = `${this.graphData.place.name} 
-      @ ${strTrimmedDate}`;
+
+      this.footerText = ``;
     }
   }
 
   public ngOnInit(): void {
-    this.graphId = `lbd-graph-${LbdGraphComponent.currentId++}`;
+    this.graphId = `lbd-tree-graph-${LbdTreeGraphComponent.currentId++}`;
   }
 
   public ngAfterViewInit(): void {
 
-    console.log(`Graph initiated. ID = #${this.graphId}`);
-    console.log("With graph data : " + JSON.stringify(this.graphData));
+    console.log(`Tree Graph initiated. ID = #${this.graphId}`);
+    console.log("With tree graph data : " + JSON.stringify(this.graphData));
     console.log("With table data : " + JSON.stringify(this.tableData));
     this.drawGraph();
 

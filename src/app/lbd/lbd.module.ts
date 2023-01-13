@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 
 import { LbdChartComponent } from './lbd-chart/lbd-chart.component';
 import { LbdGraphComponent } from './lbd-chart/lbd-graph.component';
+import { LbdTreeGraphComponent } from './lbd-chart/lbd-tree-graph.component';
 
 @NgModule({
   imports: [
@@ -14,12 +15,14 @@ import { LbdGraphComponent } from './lbd-chart/lbd-graph.component';
   declarations: [
 
     LbdChartComponent,
-    LbdGraphComponent
+    LbdGraphComponent,
+    LbdTreeGraphComponent
 
   ],
   exports: [
     LbdChartComponent,
-    LbdGraphComponent
+    LbdGraphComponent,
+    LbdTreeGraphComponent
   ]
 })
 export class LbdModule { }

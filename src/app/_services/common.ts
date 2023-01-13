@@ -45,9 +45,27 @@ export enum Alarmtype {
   }
 
   export interface GraphData {
+    name:string;
     people: GraphPerson[];
     meeting: GraphMeeting;
     place: GraphPlace;
+  }
+
+  export interface GraphCountPlaces {
+    name: string;
+    place: GraphPlace;
+    placeCount: number;
+  }
+
+  export interface GraphFofLink {
+    friend: string;
+    fof: string;
+  }
+
+  export interface GraphTreeData {
+    name:string;
+    friends: string[];
+    links: GraphFofLink[];
   }
   
   

@@ -85,11 +85,36 @@ export class HttpService {
       );
   }
 
-  getMeetingDataForUser(userId: string) {
-    console.log("getMeetingDataForUser:", userId);
+  getMeetingDataForUser(userId: string, hours:number) {
+    //console.log("getMeetingDataForUser:", userId);
     return this.http
       //.get(URL_ENDPOINT + "users/" + userIds, {
-      .get(REDIS_API_ENDPOINT + "/graph/latest/byName/" + userId + "/hours/24", {
+      .get(REDIS_API_ENDPOINT + "/graph/latest/byName/" + userId + "/hours/" + hours, {
+        responseType: "json",
+      })
+      .pipe(
+        //retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
+  getPlacesOfMeetingsForUser(userId: string, months:number) {
+    //console.log("getPlacesOfMeetingsForUser:", userId);
+    return this.http
+      //.get(URL_ENDPOINT + "users/" + userIds, {
+      .get(REDIS_API_ENDPOINT + "/graph/count/places/byName/" + userId + "/months/" + months, {
+        responseType: "json",
+      })
+      .pipe(
+        //retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
+  getFriendsOfFriendsGraphTree(userId: string) {
+    return this.http
+      //.get(URL_ENDPOINT + "users/" + userIds, {
+      .get(REDIS_API_ENDPOINT + "/graph/fof/byName/" + userId , {
         responseType: "json",
       })
       .pipe(
