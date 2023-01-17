@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { LocationStrategy, PlatformLocation, Location } from '@angular/common';
 import { LegendItem, ChartType } from '../lbd/lbd-chart/lbd-chart.component';
-import * as Chartist from 'chartist';
 import { Subscription } from "rxjs/Subscription";
 import { map, catchError, tap, switchAll } from "rxjs/operators";
 import {
@@ -17,12 +16,7 @@ import {
 import {
   HttpService
 } from "../_services/httpservice.service"
-import { Viva } from 'vivagraphjs';
 
-
-import { NguiMapModule, NguiMapComponent } from "@ngui/map";
-import { HttpClient } from "@angular/common/http";
-import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
 
 
 @Component({
@@ -63,7 +57,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // success path
         let i = 0;
         this.tableData.dataRows = data.map((item) => {
-          //console.log(item);
+          ////console.log(item);
           i++;
           return new SpyrecordClass(
             i,
@@ -80,9 +74,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.httpService.showNotification(Alarmtype.DANGER, error);
       }, // error path
       () => {
-        console.log("http call finished");
-        console.log("table rows number: " + this.tableData.dataRows.length);
-        console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
+        //console.log("http call finished");
+        //console.log("table rows number: " + this.tableData.dataRows.length);
+        //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
       }
     );
   }
@@ -101,7 +95,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // success path
         if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.ERROR);
+          //console.log(" Response message: " + data.ERROR);
           this.error = data.ERROR;
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
@@ -141,9 +135,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.httpService.showNotification(Alarmtype.DANGER, error);
       }, // error path
       () => {
-        console.log("http call for meeting data finished");
-        //console.log("table rows number: " + JSON.stringify(this.graphData));
-        console.log("getMeetingDataForUser : error: " + this.error);
+        //console.log("http call for meeting data finished");
+        ////console.log("table rows number: " + JSON.stringify(this.graphData));
+        //console.log("getMeetingDataForUser : error: " + this.error);
       }
     );
   }
@@ -162,7 +156,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // success path
         if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.ERROR);
+          //console.log(" Response message: " + data.ERROR);
           this.error = data.ERROR;
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
@@ -208,9 +202,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.httpService.showNotification(Alarmtype.DANGER, error);
       }, // error path
       () => {
-        console.log("http call for places data finished");
-        //console.log("table rows number: " + JSON.stringify(this.graphData));
-        console.log("getPlacesOfMeetingsForUser : error: " + this.error);
+        //console.log("http call for places data finished");
+        ////console.log("table rows number: " + JSON.stringify(this.graphData));
+        //console.log("getPlacesOfMeetingsForUser : error: " + this.error);
       }
     );
   }
@@ -226,7 +220,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         // success path
         if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.ERROR);
+          //console.log(" Response message: " + data.ERROR);
           this.error = data.ERROR;
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
@@ -261,9 +255,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         this.httpService.showNotification(Alarmtype.DANGER, error);
       }, // error path
       () => {
-        console.log("http call for friends data finished");
-        //console.log("table rows number: " + JSON.stringify(this.graphData));
-        console.log("getFriendsOfFriendsGraphTree : error: " + this.error);
+        //console.log("http call for friends data finished");
+        ////console.log("table rows number: " + JSON.stringify(this.graphData));
+        //console.log("getFriendsOfFriendsGraphTree : error: " + this.error);
       }
     );
   }

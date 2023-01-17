@@ -86,7 +86,7 @@ export class HttpService {
   }
 
   getMeetingDataForUser(userId: string, hours:number) {
-    //console.log("getMeetingDataForUser:", userId);
+    ////console.log("getMeetingDataForUser:", userId);
     return this.http
       //.get(URL_ENDPOINT + "users/" + userIds, {
       .get(REDIS_API_ENDPOINT + "/graph/latest/byName/" + userId + "/hours/" + hours, {
@@ -99,7 +99,7 @@ export class HttpService {
   }
 
   getPlacesOfMeetingsForUser(userId: string, months:number) {
-    //console.log("getPlacesOfMeetingsForUser:", userId);
+    ////console.log("getPlacesOfMeetingsForUser:", userId);
     return this.http
       //.get(URL_ENDPOINT + "users/" + userIds, {
       .get(REDIS_API_ENDPOINT + "/graph/count/places/byName/" + userId + "/months/" + months, {
@@ -121,6 +121,18 @@ export class HttpService {
         //retry(3), // retry a failed request up to 3 times
         catchError(this.handleError) // then handle the error
       );
+  }
+
+  checkUserPassword(userId: string, userPass: string) {
+    return this.http
+    //.get(URL_ENDPOINT + "users/" + userIds, {
+    .get(REDIS_API_ENDPOINT + "/userrepo/checkpass/byName/" + userId + "/pass/" + userPass, {
+      responseType: "json",
+    })
+    .pipe(
+      //retry(3), // retry a failed request up to 3 times
+      catchError(this.handleError) // then handle the error
+    );
   }
 
   private handleError(error: HttpErrorResponse) {

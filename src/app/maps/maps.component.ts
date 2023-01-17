@@ -70,13 +70,13 @@ export class MapsComponent implements OnInit, OnDestroy {
 
         if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.ERROR);
+          //console.log(" Response message: " + data.ERROR);
           this.error = data.ERROR;
           //reject(res);
           this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
         } else {
           //debug
-          //console.log("data received for user : " + userselected + " = " + JSON.stringify(data));
+          ////console.log("data received for user : " + userselected + " = " + JSON.stringify(data));
           this.spyrecord = new SpyrecordClass(
               1,
               data[0]["locationUpdated"],
@@ -86,13 +86,13 @@ export class MapsComponent implements OnInit, OnDestroy {
               data[0]["location"]["longitude"]
             );
           //debug
-          //console.log("spyrecord to display for user : " + userselected + " = " + JSON.stringify(this.spyrecord));
+          ////console.log("spyrecord to display for user : " + userselected + " = " + JSON.stringify(this.spyrecord));
         }
         
         if (this.spyrecord !== undefined) {
           //check that parsing is done ok
           //debug
-          //console.log("last known position for user : " + userselected + " = " + this.spyrecord.lat + "," + this.spyrecord.lng);
+          ////console.log("last known position for user : " + userselected + " = " + this.spyrecord.lat + "," + this.spyrecord.lng);
           this.positions.push([this.spyrecord.lat, this.spyrecord.lng]);
 
           this.googleMapObject.panTo(
@@ -110,10 +110,10 @@ export class MapsComponent implements OnInit, OnDestroy {
         this.httpService.showNotification(Alarmtype.DANGER, error);
       },
       () => {
-        console.log("http call finished");
-        console.log("spyrecord: " + JSON.stringify(this.spyrecord));
-        console.log("positions: " + this.positions);
-        console.log("showLastSpyrecordForUser : error: " + this.error);
+        //console.log("http call finished");
+        //console.log("spyrecord: " + JSON.stringify(this.spyrecord));
+        //console.log("positions: " + this.positions);
+        //console.log("showLastSpyrecordForUser : error: " + this.error);
       }
     );
   }
@@ -153,12 +153,12 @@ export class MapsComponent implements OnInit, OnDestroy {
 
         if (data.ERROR) {
           // not the result we expected
-          console.log(" Response message: " + data.ERROR);
+          //console.log(" Response message: " + data.ERROR);
           this.error = data.ERROR;
           this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
         }else if (data.command) {
           // not the result we expected
-          console.log("Command " + data.command + " sent to device " + data.name);
+          //console.log("Command " + data.command + " sent to device " + data.name);
           this.httpService.showNotification(Alarmtype.SUCCESS, "Command " + data.command + " sent to device " + data.name);
         } else {
           const dateFromMs = new Date(Number(String(data.message[0]).substring(0,13)));
@@ -193,10 +193,10 @@ export class MapsComponent implements OnInit, OnDestroy {
         this.httpService.showNotification(Alarmtype.DANGER, error);
       },
       () => {
-        console.log("http call finished");
-        console.log("spyrecord: " + this.spyrecord);
-        console.log("positions: " + this.positions);
-        console.log("sendCommandToUserDevice : error: " + this.error);
+        //console.log("http call finished");
+        //console.log("spyrecord: " + this.spyrecord);
+        //console.log("positions: " + this.positions);
+        //console.log("sendCommandToUserDevice : error: " + this.error);
       }
     );
   }
@@ -239,18 +239,18 @@ From redis , the data comes in this form:
 
           if (data.ERROR) {
             // not the result we expected
-            console.log(" Response message: " + data.ERROR);
+            //console.log(" Response message: " + data.ERROR);
             this.error = data.ERROR;
             //reject(res);
             this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
           } else {   
-            //console.log(`data.tracks : ${data.tracks}`)  
-            //console.log(`data.tracks.length : ${data.tracks.length}`)  
-            //console.log(`data.tracks[0] : ${data.tracks[0]}`)   
-            //console.log(`data.tracks[0][0] : ${data.tracks[0][0]}`)
-            //console.log(`data.tracks[0][1] : ${data.tracks[0][1]}`)
-            //console.log(`data.tracks[0][1][1] : ${data.tracks[0][1][1]}`)
-            //console.log(`data.tracks[0][1][3] : ${data.tracks[0][1][3]}`)
+            ////console.log(`data.tracks : ${data.tracks}`)  
+            ////console.log(`data.tracks.length : ${data.tracks.length}`)  
+            ////console.log(`data.tracks[0] : ${data.tracks[0]}`)   
+            ////console.log(`data.tracks[0][0] : ${data.tracks[0][0]}`)
+            ////console.log(`data.tracks[0][1] : ${data.tracks[0][1]}`)
+            ////console.log(`data.tracks[0][1][1] : ${data.tracks[0][1][1]}`)
+            ////console.log(`data.tracks[0][1][3] : ${data.tracks[0][1][3]}`)
 
             var flightPlanCoordinates = [];
             var flightPlanPositions = [];
@@ -270,7 +270,7 @@ From redis , the data comes in this form:
             }
 
             data.tracks.map((item) => {
-              //console.log(item["Userid"]);
+              ////console.log(item["Userid"]);
               flightPlanCoordinates.push(
                 new google.maps.LatLng({
                   lat: Number(item[1][3]),
@@ -325,9 +325,9 @@ From redis , the data comes in this form:
           this.httpService.showNotification(Alarmtype.DANGER, error);
         }, // error path
         () => {
-          console.log("http call finished");
-          console.log("track locations received: " + this.maxTrackDataReceived);
-          console.log("showPathOfUserForTimePeriod : error: " + this.error);
+          //console.log("http call finished");
+          //console.log("track locations received: " + this.maxTrackDataReceived);
+          //console.log("showPathOfUserForTimePeriod : error: " + this.error);
         }
       );
   }
@@ -340,7 +340,7 @@ From redis , the data comes in this form:
         // success path
         let i = 0;
         this.tableData1.dataRows = data.map((item) => {
-          //console.log(item);
+          ////console.log(item);
           i++;
           return new SpyrecordClass(
             i,
@@ -357,26 +357,26 @@ From redis , the data comes in this form:
         this.httpService.showNotification(Alarmtype.DANGER, error);
       }, // error path
       () => {
-        console.log("http call finished");
-        console.log("table rows number: " + this.tableData1.dataRows.length);
-        console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
+        //console.log("http call finished");
+        //console.log("table rows number: " + this.tableData1.dataRows.length);
+        //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
       }
     );
   }
 
   onMapReady(map) {
     //this.map = map;
-    //console.log("map", map);
-    //console.log("this.map", this.map);
-    //console.log("this.map.map", this.map.map);
-    console.log("markers", map.markers); // to get all markers as an array
+    ////console.log("map", map);
+    ////console.log("this.map", this.map);
+    ////console.log("this.map.map", this.map.map);
+    //console.log("markers", map.markers); // to get all markers as an array
     this.googleMapObject = map.data.map;
   }
   onIdle(event) {
-    console.log("map idle event", event.target);
+    //console.log("map idle event", event.target);
   }
   onMarkerInit(marker) {
-    console.log("marker init", marker);
+    //console.log("marker init", marker);
     //this.googleMapObject.panTo(marker.latLng);
   }
   onMapClick(event) {

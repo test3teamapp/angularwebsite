@@ -67,6 +67,10 @@ export enum Alarmtype {
     friends: string[];
     links: GraphFofLink[];
   }
+
+  export interface LoginCheckData {
+    RESULT:string;
+  }
   
   
   

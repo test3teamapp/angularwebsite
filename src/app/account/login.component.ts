@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
     // convenience getter for easy access to form fields
     get f() { return this.form.controls; }
 
-    onSubmit() {
+    async onSubmit() {
         this.submitted = true;
 
         // stop here if form is invalid
@@ -37,13 +37,14 @@ export class LoginComponent implements OnInit {
         }
 
         this.loading = true;
-        if (this.accountService.login(this.f.username.value, this.f.password.value) != null) {
-            console.log("login successfull");
+        if (await this.accountService.login(this.f.username.value, this.f.password.value) != null) {
+            //console.log("login successfull");
             // get return url from query parameters or default to home page
             const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
             this.router.navigateByUrl(returnUrl);
+            //this.router.navigate(['/']);
         } else {
-            console.log("login error: ");
+            //console.log("login error: ");
             this.loading = false;
         }
     }

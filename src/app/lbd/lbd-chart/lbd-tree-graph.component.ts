@@ -55,7 +55,7 @@ export class LbdTreeGraphComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    console.log(" changes detected : " + JSON.stringify(changes));
+    //console.log(" changes detected : " + JSON.stringify(changes));
     this.drawGraph();
     //throw new Error('Method not implemented.');
   }
@@ -78,8 +78,9 @@ export class LbdTreeGraphComponent implements OnInit, AfterViewInit, OnChanges {
 
       const nameInRequest = this.graphData.name;
 
-      var graphics = Viva.Graph.View.svgGraphics(),
-        nodeSize = 12;
+      var graphics = Viva.Graph.View.svgGraphics();
+      var nodeSize = 12;
+
 
       this.graph.addNode(this.graphData.name, this.graphData.name);
       this.graphData.friends.forEach(p => { // there are strings
@@ -140,9 +141,9 @@ export class LbdTreeGraphComponent implements OnInit, AfterViewInit, OnChanges {
 
   public ngAfterViewInit(): void {
 
-    console.log(`Tree Graph initiated. ID = #${this.graphId}`);
-    console.log("With tree graph data : " + JSON.stringify(this.graphData));
-    console.log("With table data : " + JSON.stringify(this.tableData));
+    //console.log(`Tree Graph initiated. ID = #${this.graphId}`);
+    //console.log("With tree graph data : " + JSON.stringify(this.graphData));
+    //console.log("With table data : " + JSON.stringify(this.tableData));
     this.drawGraph();
 
   }

@@ -4312,7 +4312,7 @@ var events = require('ngraph.events');
 module.exports = backwardCompatibleEvents;
 
 function backwardCompatibleEvents(g) {
-  console.log("This method is deprecated. Please use Viva.events() instead");
+  //console.log("This method is deprecated. Please use Viva.events() instead");
 
   if (!g) {
     return g;

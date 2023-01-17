@@ -55,7 +55,7 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    //console.log(" changes detected : " + JSON.stringify(changes));
+    ////console.log(" changes detected : " + JSON.stringify(changes));
     this.drawGraph();
     //throw new Error('Method not implemented.');
   }
@@ -79,8 +79,8 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
       const nameInRequest = this.graphData.name;
       const placeId = this.graphData.place.id;
 
-      var graphics = Viva.Graph.View.svgGraphics(),
-        nodeSize = 24;
+      var graphics = Viva.Graph.View.svgGraphics();
+      var nodeSize = 12;
 
       const strTrimmedDate = this.graphData.meeting.date.replace('(Coordinated Universal Time)', '');
 
@@ -138,9 +138,9 @@ export class LbdGraphComponent implements OnInit, AfterViewInit, OnChanges {
 
   public ngAfterViewInit(): void {
 
-    console.log(`Graph initiated. ID = #${this.graphId}`);
-    console.log("With graph data : " + JSON.stringify(this.graphData));
-    console.log("With table data : " + JSON.stringify(this.tableData));
+    //console.log(`Graph initiated. ID = #${this.graphId}`);
+    //console.log("With graph data : " + JSON.stringify(this.graphData));
+    //console.log("With table data : " + JSON.stringify(this.tableData));
     this.drawGraph();
 
   }

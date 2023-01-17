@@ -59,7 +59,7 @@ export class LbdChartComponent implements OnInit, AfterViewInit, OnChanges {
   }
   ngOnChanges(changes: SimpleChanges): void {
     //throw new Error('Method not implemented.');
-    //console.log(" changes detected : " + JSON.stringify(changes));
+    ////console.log(" changes detected : " + JSON.stringify(changes));
     if (changes.chartData.firstChange != true) {
       switch (this.chartType) {
         case ChartType.Pie:
