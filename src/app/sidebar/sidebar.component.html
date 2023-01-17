@@ -4,18 +4,13 @@
         
     </div>
     <ul class="nav responsive-nav">
-        <li *ngIf="isMobileMenu()">
-            <a class="dropdown-toggle" data-toggle="dropdown">
-                
-				<p class="hidden-lg hidden-md">Dashboard</p>
-            </a>
-        </li>
-       
         
         <li *ngIf="isMobileMenu()">
-            <a>
-                <p>Log out</p>
-            </a>
+            <p class="hidden-lg hidden-md">
+            <button type="button" class="btn btn-primary" (click)="logoutUser()">
+                Log out
+            </button>
+            </p>
         </li>
         <li class="separator hidden-lg hidden-md" *ngIf="isMobileMenu()"></li>
         <li routerLinkActive="active" *ngFor="let menuItem of menuItems" class="{{menuItem.class}}">
