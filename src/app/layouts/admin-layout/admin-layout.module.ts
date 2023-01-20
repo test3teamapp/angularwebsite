@@ -20,7 +20,7 @@ import { MapsComponent } from '../../maps/maps.component';
     FormsModule,
     LbdModule,
     WebsocketModule,
-    NguiMapModule.forRoot({apiUrl: 'https://maps.google.com/maps/api/js?key=AIzaSyD_SJhBG9d_s46ME-nP5IP6jZnrQNO7uHs'})
+    NguiMapModule.forRoot({apiUrl: })
   ],
   declarations: [
     HomeComponent,
