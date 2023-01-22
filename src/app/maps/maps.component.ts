@@ -156,10 +156,37 @@ export class MapsComponent implements OnInit, OnDestroy {
           //console.log(" Response message: " + data.ERROR);
           this.error = data.ERROR;
           this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
-        }else if (data.command) {
-          // not the result we expected
+        }else if (data.command) {          
           //console.log("Command " + data.command + " sent to device " + data.name);
           this.httpService.showNotification(Alarmtype.SUCCESS, "Command " + data.command + " sent to device " + data.name);
+        }
+      },
+      (error) => {
+        // error path
+        this.error = error;
+        this.httpService.showNotification(Alarmtype.DANGER, error);
+      },
+      () => {
+        //console.log("http call finished");
+        //console.log("spyrecord: " + this.spyrecord);
+        //console.log("positions: " + this.positions);
+        //console.log("sendCommandToUserDevice : error: " + this.error);
+      }
+    );
+
+    // if the command is to trigger a LU, then sent a seperate http request to 
+    // initiate a blocking function to listen the DB for new entries
+    if (command !== "TRIGGER_LU") return;
+    //else  
+    this.httpService.waitForLUFromDevice(userselected).subscribe(
+      (data: any) => {
+        // success path
+
+        if (data.ERROR) {
+          // not the result we expected
+          //console.log(" Response message: " + data.ERROR);
+          this.error = data.ERROR;
+          this.httpService.showNotification(Alarmtype.WARNING, data.ERROR);
         } else {
           const dateFromMs = new Date(Number(String(data.message[0]).substring(0,13)));
 

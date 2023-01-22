@@ -61,6 +61,23 @@ export class HttpService {
       );
   }
 
+  waitForLUFromDevice(userId: string) {
+    // our client app handles these commands (as keys in the message)
+    //mMsgCommandTRIGGERLU := "TRIGGER_LU"
+    //mMsgCommandSTARTTRACKING := "START_TRACKING"
+    //mMsgCommandSTOPTRACKING := "STOP_TRACKING"
+
+    return this.http
+      //.get<Spyrecord>(URL_ENDPOINT_FIREBASESERVER + "user/" + userId + "/command/" + command, {
+      .get(REDIS_API_ENDPOINT + "/waitForLU/byName/" + userId , {
+        responseType: "json",
+      })
+      .pipe(
+        //retry(3), // retry a failed request up to 3 times
+        catchError(this.handleError) // then handle the error
+      );
+  }
+
   getSpyrecordOfUserForTimePeriod(userId: string, pastHours: number) {
     return this.http
       //.get<Spyrecord>(URL_ENDPOINT + "user/" + userId + "/tp/" + pastHours, {
