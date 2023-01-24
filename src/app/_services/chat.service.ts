@@ -7,43 +7,38 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
 import { catchError, map } from "rxjs/operators";
-import { BehaviorSubject, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, Subject, Observable, throwError } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { User } from '../_models/user';
+import { io } from "socket.io-client";
 
 import {
     Alarmtype,
     LoginCheckData
-} from "../_services/common";
+} from "./common";
+import { isUndefined } from 'util';
 
 const REDIS_API_ENDPOINT = environment.redisapiEndpoint;
 
 declare var $: any;
 
 @Injectable({ providedIn: 'root' })
-export class AccountService {
+export class ChatService {
     private logginCheck: boolean = false;
-    private waitForLogin: boolean = true;
-    private userSubject: BehaviorSubject<User>;
-    public user: Observable<User>;
+    private user: User;
 
     constructor(
         private router: Router,
         private http: HttpClient
     ) {
-        this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
-        this.user = this.userSubject.asObservable();
+        //this.user = new User(JSON.parse(localStorage.getItem('user')));
     }
 
-    public get userValue(): User {
-        return this.userSubject.value;
-    }
+    socket = io('http://rheotome.eu:3000');
 
-    // using static authentication
     async login(username: string, password: string) {
         this.logginCheck = false;
-        this.waitForLogin = true;
 
         var data = await this.checkUserPassword(username, password).toPromise();
         //console.log(JSON.stringify(data));
@@ -59,25 +54,21 @@ export class AccountService {
         //console.log("login check : " + this.logginCheck);
         if (this.logginCheck) {
             const user = {
-                id: "sdjhfsv98sayugasdnvkjsa",
+                id: '',
                 username: username,
                 password: "",
                 firstName: "",
                 lastName: "",
-                token: "sdjkbn7wekjvkj;sd873ses@adsfwe"
+                token: data.token
             };
 
-            localStorage.setItem('user', JSON.stringify(user));
-
-            // publish updated user to subscribers
-            this.userSubject.next(user);
             return user;
         } else {
             return null;
         }
     }
 
-    checkUserPassword(userId: string, userPass: string): Observable<LoginCheckData> {
+    private checkUserPassword(userId: string, userPass: string): Observable<LoginCheckData> {
         return this.http
             .get<LoginCheckData>(REDIS_API_ENDPOINT + "/userrepo/checkpass/byName/" + userId + "/pass/" + userPass, {
                 responseType: "json",
@@ -124,13 +115,6 @@ export class AccountService {
                 },
             }
         );
-    }
-
-    logout() {
-        // remove user from local storage and set current user to null
-        localStorage.removeItem('user');
-        this.userSubject.next(null);
-        this.router.navigate(['/account/login']);
     }
 
 }

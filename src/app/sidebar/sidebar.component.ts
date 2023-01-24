@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { AccountService } from '../_services/account.services';
+import { AccountService } from '../_services/account.service';
 
 declare const $: any;
 declare interface RouteInfo {
@@ -15,7 +15,7 @@ export const ROUTES: RouteInfo[] = [
   //{ path: '/typography', title: 'Typography',  icon:'pe-7s-news-paper', class: '' },
   //{ path: '/icons', title: 'Icons',  icon:'pe-7s-science', class: '' },
   { path: '/maps', title: 'Maps', icon: 'pe-7s-map-marker', class: '' },
-  //{ path: '/notifications', title: 'Notifications',  icon:'pe-7s-bell', class: '' },
+  { path: '/chat', title: 'Chat',  icon:'pe-7s-speaker', class: '' },
   //{ path: '/upgrade', title: 'Upgrade to PRO',  icon:'pe-7s-rocket', class: 'active-pro' },
 ];
 

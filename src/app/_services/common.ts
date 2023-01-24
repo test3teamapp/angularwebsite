@@ -70,6 +70,7 @@ export enum Alarmtype {
 
   export interface LoginCheckData {
     RESULT:string;
+    token?:string;
   }
   
   
