@@ -1,0 +1,79 @@
+.lightGreenBackground {
+    background-color: rgb(198, 235, 198);
+}
+
+.msg_container_panel {
+    margin: 0;
+    padding: 0 10px 10px;
+    margin: 10px 10px 10px;
+    height: 500px;
+    background-color: transparent;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.msg_container_base {
+    margin: 0;
+    padding: 0 2px 2px;
+    max-height: 50;
+    overflow-x: hidden;
+    overflow-y: scroll;
+}
+
+.msg_receive {
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.msg_sent {
+    padding-bottom: 20px;
+    margin-right: 0;
+}
+
+.messages {
+    padding: 10px;
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    max-width: 100%;
+}
+
+.messages>p {
+    font-size: 13px;
+    margin: 0 0 0.2rem 0;
+}
+
+.messages>time {
+    font-size: 11px;
+    color: rgb(100, 98, 98);
+}
+
+.msg_container {
+    padding: 10px;
+    overflow: hidden;
+    display: flex;
+}
+
+.base_sent {
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.msg_sent>time {
+    float: right;
+}
+
+
+.msg_container_base::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    background-color: #F5F5F5;
+}
+
+.msg_container_base::-webkit-scrollbar {
+    width: 12px;
+    background-color: #F5F5F5;
+}
+
+.msg_container_base::-webkit-scrollbar-thumb {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #555;
+}

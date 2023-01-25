@@ -77,6 +77,12 @@ export enum Alarmtype {
     RESULT:string;
     users?:string[];
   }
+
+  export interface ChatMessage {
+    from:string;
+    to:string;
+    message:string;
+  }
   
   
   

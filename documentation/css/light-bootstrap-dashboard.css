@@ -3612,13 +3612,13 @@ input:focus {
   }
 }
 @media (min-width: 992px) {
-  .table-full-width {
+  .-full-width {
     margin-left: -15px;
     margin-right: -15px;
   }
 
   .table-responsive {
-    overflow: visible;
+    overflow: auto;
   }
 }
 @media (max-width: 991px) {
@@ -3626,7 +3626,7 @@ input:focus {
     width: 100%;
     margin-bottom: 15px;
     overflow-x: scroll;
-    overflow-y: hidden;
+    overflow-y: auto;
     -ms-overflow-style: -ms-autohiding-scrollbar;
     -webkit-overflow-scrolling: touch;
   }

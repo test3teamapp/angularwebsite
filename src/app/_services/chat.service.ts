@@ -16,7 +16,8 @@ import { AccountService } from './account.service';
 
 import {
     Alarmtype,
-    LoggedinUsersData
+    LoggedinUsersData,
+    ChatMessage
 } from "./common";
 import { isUndefined } from 'util';
 
@@ -29,28 +30,52 @@ export class ChatService {
     private logginCheck: boolean = false;
     private user: User;
     public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
+    private socket;
 
     constructor(
         private router: Router,
         private http: HttpClient,
         private accountService: AccountService
     ) {
-        //this.user = new User(JSON.parse(localStorage.getItem('user')));
+
+        this.socket = io('http://rheotome.eu:3000');
+        this.socket.on("connect", () => {
+            console.log(this.socket.id); // x8WIv7-mJelg7on_ALbx
+        });
+        this.socket.on("whoAreU", () => {
+            this.socket.emit("setUsername", this.accountService.userValue.username);
+        });
     }
 
-    socket = io('http://rheotome.eu:3000');
+    private updateScroll(){
+        var element = document.getElementById("msgsPanel");
+        element.scrollTop = element.scrollHeight - element.clientHeight;
+    }
 
-    public sendMessage(message: string) {
-        this.socket.emit('message', message);
-      }
-    
-      public getNewMessage = () => {
-        this.socket.on('message', (message) =>{
-          this.messageSubject.next(message);
+    public whoAmI():string {
+        return this.accountService.userValue.username;
+    }
+
+    public sendMessage(toUser:string, msg: string) {
+        let chatMsg: ChatMessage;
+        chatMsg = {
+            from:this.accountService.userValue.username,
+            to:toUser,
+            message: msg
+        }
+        this.socket.emit('message', JSON.stringify(chatMsg));
+        this.updateScroll();
+    }
+
+    public getNewMessage = () => {
+        this.socket.on('message', (message) => {
+            
+            this.messageSubject.next(message);
+            this.updateScroll();
         });
-        
+
         return this.messageSubject.asObservable();
-      };
+    };
 
     async getLoggedInUsers() {
         this.logginCheck = false;
@@ -61,20 +86,21 @@ export class ChatService {
             // not verified  credentialls
             this.showNotification(Alarmtype.WARNING, "User not verified. Leave CHAT !");
             return null;
-        } 
+        }
         // continue
         var data = await this.getLoggedInUsersFromDB().toPromise();
         //console.log(JSON.stringify(data));
-        if (data.RESULT !== 'OK') {            
+        if (data.RESULT !== 'OK') {
             //console.log(" Response message: " + data.RESULT);
             this.showNotification(Alarmtype.WARNING, data.RESULT);
             return null;
-        } 
+        }
         //continue. return a list of logged in users
         return data.users;
     }
 
-    private getLoggedInUsersFromDB(): Observable<LoggedinUsersData> {
+    public getLoggedInUsersFromDB(): Observable<LoggedinUsersData> {
+        
         return this.http
             .get<LoggedinUsersData>(REDIS_API_ENDPOINT + "/userrepo/getloggedin", {
                 responseType: "json",
