@@ -34,8 +34,10 @@ export class ChatComponent implements OnInit, OnDestroy {
   //---------------------------------
 
   constructor(
-    private httpService: HttpService,
-    private chatService: ChatService) { }
+    private chatService: ChatService) {
+
+      chatService.getLoggedInUsers();
+     }
 
   ngOnInit() {
   }

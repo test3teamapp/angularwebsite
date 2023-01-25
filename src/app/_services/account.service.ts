@@ -94,6 +94,31 @@ export class AccountService {
             );
     }
 
+    async verifyLogin(): Promise<boolean> {
+
+        var data = await this.verifyLoginByToken().toPromise();
+        //console.log(JSON.stringify(data));
+        if (data.RESULT !== 'OK') {
+            // not correct credentialls
+            //console.log(" Response message: " + data.RESULT);
+            this.showNotification(Alarmtype.WARNING, data.RESULT);
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private verifyLoginByToken(): Observable<LoginCheckData> {
+        return this.http
+            .get<LoginCheckData>(REDIS_API_ENDPOINT + "/userrepo/verify/byToken/" + this.userSubject.value.token, {
+                responseType: "json",
+            })
+            .pipe(
+                map(response => response as LoginCheckData),
+                catchError(this.handleError) // then handle the error
+            );
+    }
+
     private handleError(error: HttpErrorResponse) {
         var erroMsg = "";
         if (error.error instanceof ErrorEvent) {

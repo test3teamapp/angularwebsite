@@ -12,10 +12,11 @@ import { BehaviorSubject, Subject, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { User } from '../_models/user';
 import { io } from "socket.io-client";
+import { AccountService } from './account.service';
 
 import {
     Alarmtype,
-    LoginCheckData
+    LoggedinUsersData
 } from "./common";
 import { isUndefined } from 'util';
 
@@ -27,54 +28,59 @@ declare var $: any;
 export class ChatService {
     private logginCheck: boolean = false;
     private user: User;
+    public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
 
     constructor(
         private router: Router,
-        private http: HttpClient
+        private http: HttpClient,
+        private accountService: AccountService
     ) {
         //this.user = new User(JSON.parse(localStorage.getItem('user')));
     }
 
     socket = io('http://rheotome.eu:3000');
 
-    async login(username: string, password: string) {
+    public sendMessage(message: string) {
+        this.socket.emit('message', message);
+      }
+    
+      public getNewMessage = () => {
+        this.socket.on('message', (message) =>{
+          this.messageSubject.next(message);
+        });
+        
+        return this.messageSubject.asObservable();
+      };
+
+    async getLoggedInUsers() {
         this.logginCheck = false;
 
-        var data = await this.checkUserPassword(username, password).toPromise();
+        var result = await this.accountService.verifyLogin();
         //console.log(JSON.stringify(data));
-        if (data.RESULT !== 'OK') {
-            // not correct credentialls
+        if (!result) {
+            // not verified  credentialls
+            this.showNotification(Alarmtype.WARNING, "User not verified. Leave CHAT !");
+            return null;
+        } 
+        // continue
+        var data = await this.getLoggedInUsersFromDB().toPromise();
+        //console.log(JSON.stringify(data));
+        if (data.RESULT !== 'OK') {            
             //console.log(" Response message: " + data.RESULT);
             this.showNotification(Alarmtype.WARNING, data.RESULT);
-            this.logginCheck = false;
-        } else {
-            this.logginCheck = true;
-        }
-
-        //console.log("login check : " + this.logginCheck);
-        if (this.logginCheck) {
-            const user = {
-                id: '',
-                username: username,
-                password: "",
-                firstName: "",
-                lastName: "",
-                token: data.token
-            };
-
-            return user;
-        } else {
             return null;
-        }
+        } 
+        //continue. return a list of logged in users
+        return data.users;
     }
 
-    private checkUserPassword(userId: string, userPass: string): Observable<LoginCheckData> {
+    private getLoggedInUsersFromDB(): Observable<LoggedinUsersData> {
         return this.http
-            .get<LoginCheckData>(REDIS_API_ENDPOINT + "/userrepo/checkpass/byName/" + userId + "/pass/" + userPass, {
+            .get<LoggedinUsersData>(REDIS_API_ENDPOINT + "/userrepo/getloggedin", {
                 responseType: "json",
             })
             .pipe(
-                map(response => response as LoginCheckData),
+                map(response => response as LoggedinUsersData),
                 catchError(this.handleError) // then handle the error
             );
     }

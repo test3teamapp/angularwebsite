@@ -72,6 +72,11 @@ export enum Alarmtype {
     RESULT:string;
     token?:string;
   }
+
+  export interface LoggedinUsersData {
+    RESULT:string;
+    users?:string[];
+  }
   
   
   
