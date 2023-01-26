@@ -25,7 +25,7 @@
             <div class="col-md-10">
                 <div id="msgsPanel" class="panel msg_container_panel">
                     <div class="panel-body msg_container_base" *ngFor="let msg of messages">
-                        <div class="row msg_container"
+                        <div *ngIf="(msg.from === whoAmI() && msg.to === selectedUserToChat) || (msg.to === whoAmI() && msg.from === selectedUserToChat)"   class="row msg_container"
                             [ngClass]="msg.from === whoAmI() ? 'row msg_container base_sent' : 'row msg_container base_receive'">
                             <div class="col-md-8 col-xs-8">
                                 <div class="messages msg_sent"

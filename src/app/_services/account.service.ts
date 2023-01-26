@@ -26,14 +26,28 @@ declare var $: any;
 export class AccountService {
     private logginCheck: boolean = false;
     private userSubject: BehaviorSubject<User>;
+    private loginStatusSubject: BehaviorSubject<Boolean>;
 
     constructor(
         private router: Router,
         private http: HttpClient
     ) {
+        this.loginStatusSubject = new BehaviorSubject(false);
         this.userSubject = new BehaviorSubject<User>(JSON.parse(localStorage.getItem('user')));
-
+        if(this.userSubject.value != null){
+            this.logginCheck = true;
+            console.log("AccountService : user = " + this.userSubject.value.username);
+            this.loginStatusSubject.next(this.logginCheck);
+        }else {
+            console.log("AccountService : user = undefined");
+        }
+        
     }
+
+    public getLoginStatusObservable = () => {
+        this.loginStatusSubject.next(this.logginCheck);
+        return this.loginStatusSubject.asObservable();
+    };
 
     public get userValue(): User {
         return this.userSubject.value;
@@ -50,6 +64,7 @@ export class AccountService {
 
     async login(username: string, password: string) {
         this.logginCheck = false;
+        this.loginStatusSubject.next(this.logginCheck);
 
         var data = await this.checkUserPassword(username, password).toPromise();
         //console.log(JSON.stringify(data));
@@ -58,8 +73,10 @@ export class AccountService {
             //console.log(" Response message: " + data.RESULT);
             this.showNotification(Alarmtype.WARNING, data.RESULT);
             this.logginCheck = false;
+            this.loginStatusSubject.next(this.logginCheck);
         } else {
             this.logginCheck = true;
+            this.loginStatusSubject.next(this.logginCheck);
         }
 
         //console.log("login check : " + this.logginCheck);
@@ -163,6 +180,8 @@ export class AccountService {
         if (data.RESULT !== 'OK') {
             this.showNotification(Alarmtype.WARNING, data.RESULT);
         } 
+        this.logginCheck = false;
+        this.loginStatusSubject.next(this.logginCheck);
         // remove user from local storage and set current user to null
         localStorage.removeItem('user');
         this.userSubject.next(null);

@@ -82,6 +82,9 @@ export enum Alarmtype {
     from:string;
     to:string;
     message:string;
+    event?:{
+      type:string,
+      user:string}
   }
   
   

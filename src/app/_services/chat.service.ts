@@ -27,7 +27,8 @@ declare var $: any;
 
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-    private logginCheck: boolean = false;
+    private isUserLoggedIn: boolean;
+    private usernameOfloggedInUser: string = "";
     private user: User;
     public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
     private socket;
@@ -35,56 +36,90 @@ export class ChatService {
     constructor(
         private router: Router,
         private http: HttpClient,
-        private accountService: AccountService
+        private accountService: AccountService,
+
     ) {
 
+        this.accountService.getLoginStatusObservable().subscribe((isUserLoggedIn: boolean) => {
+            console.log("isUserLoggedIn update: " + isUserLoggedIn + ". Socket status:" + ((this.socket == null) ? "null" : this.socket.username)); 
+            // if we are not yet connected...
+            if ((!this.isUserLoggedIn && isUserLoggedIn) || this.socket == null) {
+               this.connectSocket();
+            }
+            this.isUserLoggedIn = isUserLoggedIn;
+            if (isUserLoggedIn) {
+                if (this.accountService.userValue != null) {
+                    this.usernameOfloggedInUser = this.accountService.userValue.username;
+                }
+            } else {
+                this.usernameOfloggedInUser = "";
+                // disconnect sockets.
+                this.socket.emit("logout");
+                this.socket = null;
+            }
+        });
+    }
+
+    private connectSocket() {
+        // switching from not logged in to logged in, so connect
         this.socket = io('http://rheotome.eu:3000');
         this.socket.on("connect", () => {
-            console.log(this.socket.id); // x8WIv7-mJelg7on_ALbx
+            console.log("connecting socket " + this.socket.id); // x8WIv7-mJelg7on_ALbx
         });
+        // and wait for credentials request.
         this.socket.on("whoAreU", () => {
-            this.socket.emit("setUsername", this.accountService.userValue.username);
+            this.socket.emit("setUsername", this.accountService.userValue.username, this.accountService.userValue.token);
         });
+
     }
 
-    private updateScroll(){
-        var element = document.getElementById("msgsPanel");
-        element.scrollTop = element.scrollHeight - element.clientHeight;
+    public disconnectSocket() {
+        // switching from not logged in to logged in, so connect
+        this.socket.disconnect();
+        this.socket = null;
+
     }
 
-    public whoAmI():string {
-        return this.accountService.userValue.username;
+    public clearSocketBuffer() {
+        if (this.socket != null){
+            this.socket.sendBuffer = [];
+        }
+
     }
 
-    public sendMessage(toUser:string, msg: string) {
+    public whoAmI(): string {
+        return this.usernameOfloggedInUser;
+    }
+
+    public sendMessage(toUser: string, msg: string) {
         let chatMsg: ChatMessage;
         chatMsg = {
-            from:this.accountService.userValue.username,
-            to:toUser,
+            from: this.accountService.userValue.username,
+            to: toUser,
             message: msg
         }
-        this.socket.emit('message', JSON.stringify(chatMsg));
-        this.updateScroll();
+        if (this.socket != null){
+            this.socket.sendBuffer = [];
+            this.socket.emit('message', JSON.stringify(chatMsg));
+        }
     }
 
     public getNewMessage = () => {
         this.socket.on('message', (message) => {
-            
+
             this.messageSubject.next(message);
-            this.updateScroll();
         });
 
         return this.messageSubject.asObservable();
     };
 
     async getLoggedInUsers() {
-        this.logginCheck = false;
 
         var result = await this.accountService.verifyLogin();
         //console.log(JSON.stringify(data));
         if (!result) {
             // not verified  credentialls
-            this.showNotification(Alarmtype.WARNING, "User not verified. Leave CHAT !");
+            this.showNotification(Alarmtype.WARNING, "User not verified. Leave CHAT !", 1);
             return null;
         }
         // continue
@@ -92,7 +127,7 @@ export class ChatService {
         //console.log(JSON.stringify(data));
         if (data.RESULT !== 'OK') {
             //console.log(" Response message: " + data.RESULT);
-            this.showNotification(Alarmtype.WARNING, data.RESULT);
+            this.showNotification(Alarmtype.WARNING, data.RESULT, 1);
             return null;
         }
         //continue. return a list of logged in users
@@ -100,7 +135,7 @@ export class ChatService {
     }
 
     public getLoggedInUsersFromDB(): Observable<LoggedinUsersData> {
-        
+
         return this.http
             .get<LoggedinUsersData>(REDIS_API_ENDPOINT + "/userrepo/getloggedin", {
                 responseType: "json",
@@ -129,18 +164,18 @@ export class ChatService {
         return throwError(erroMsg);
     }
 
-    showNotification(alarmtype: Alarmtype, msg: string) {
+    showNotification(alarmtype: Alarmtype, msg: string, seconds: number) {
 
         //var color = Math.floor(Math.random() * 4 + 1);
         $.notify(
             {
-                icon: "pe-7s-attention",
+                icon: "pe-7s-info",
                 message:
                     msg,
             },
             {
                 type: alarmtype,
-                timer: 1000,
+                timer: seconds * 1000,
                 placement: {
                     from: "top",
                     align: "center",
