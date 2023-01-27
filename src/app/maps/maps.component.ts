@@ -5,7 +5,8 @@ import {
   Spyrecord,
   SpyrecordClass,
   Alarmtype,
-  TableData
+  TableData,
+  ChatMessage
 } from "../_services/common";
 import {
   HttpService
@@ -15,6 +16,7 @@ import { HttpClient } from "@angular/common/http";
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
 import { isUndefined } from "util";
 import { jsonize } from "@ngui/map/services/util";
+import { ChatService } from "app/_services/chat.service";
 
 @Component({
   selector: "app-maps",
@@ -24,6 +26,8 @@ import { jsonize } from "@ngui/map/services/util";
   styles: [".error {color: red;}"],
 })
 export class MapsComponent implements OnInit, OnDestroy {
+  private previousMessage:string = "";
+  private subscriptionToNewMessages:Subscription;
   error: any;
   headers: string[];
   spyrecord: SpyrecordClass;
@@ -47,7 +51,7 @@ export class MapsComponent implements OnInit, OnDestroy {
   /// All methods are the same (in name and function, although return data are slightly different
   // and needed different handling)
   // as with the HttpService we use when the website calls directly the gospy api on the Oracle server
-  constructor(private httpService: HttpService, private http: HttpClient) { }
+  constructor(private httpService: HttpService, private http: HttpClient, private chatService: ChatService) { }
 
   clear() {
     //this.httpService = undefined;
@@ -412,6 +416,36 @@ From redis , the data comes in this form:
   }
 
   ngOnInit() {
+
+    // subscribe to receive notifications of new chat messages
+    this.subscriptionToNewMessages = this.chatService.getNewMessage().subscribe((message: string) => {      
+      if (message != this.previousMessage){
+        this.previousMessage = message;
+        const msg: ChatMessage = JSON.parse(message);
+        
+        if (this.chatService.whoAmI() === "") return // we are not logged in !!! but socket is still on
+
+        if (msg.to === this.chatService.whoAmI()) { // msg are sent unicast
+          this.chatService.showNotification(Alarmtype.SUCCESS, msg.from + " says: " + msg.message, 1);
+        }
+
+        // handle user events "disconnect" / "connect"
+        if (msg.event) {
+          if (msg.event.type === "disconnect") {
+            if (msg.event.user === this.chatService.whoAmI()){
+              this.chatService.disconnectSocket();
+            }else {             
+              this.chatService.showNotification(Alarmtype.WARNING, msg.message, 1);
+            }
+          } else if (msg.event.type === "connect") {
+            if (msg.event.user != this.chatService.whoAmI()) {                            
+              this.chatService.showNotification(Alarmtype.INFO, msg.message, 1);
+            }
+          }
+        }
+      }
+    })
+
     this.tableData1 = {
       headerRow: ["ID", "last seen", "lat", "lng"],
       dataRows: [],
@@ -420,5 +454,8 @@ From redis , the data comes in this form:
     this.getListOfLastSpyrecordsForAllUsers("all");
   }
 
-  ngOnDestroy() { }
+  ngOnDestroy() { 
+    // unsubscribe from chat
+    this.subscriptionToNewMessages.unsubscribe();
+  }
 }

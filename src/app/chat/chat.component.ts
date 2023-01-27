@@ -31,6 +31,8 @@ import { ChatService } from '../_services/chat.service';
 })
 export class ChatComponent implements OnInit, OnDestroy {
 
+  private previousMessage:string = "";
+  private subscriptionToNewMessages:Subscription;
   public usernames: string[];
   public messages = [];
   public selectedUserToChat: string;
@@ -46,7 +48,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-    this.chatService.getLoggedInUsersFromDB().subscribe(
+     this.chatService.getLoggedInUsersFromDB().subscribe(
       (data: any) => {
         // success path
         if (data.RESULT !== 'OK') {
@@ -71,9 +73,10 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     );
 
-    this.chatService.getNewMessage().subscribe((message: string) => {
-      if (message) {
-        console.log(message);
+    this.subscriptionToNewMessages = this.chatService.getNewMessage().subscribe((message: string) => {      
+      if (message != this.previousMessage){
+        this.previousMessage = message;
+        //console.log("getNewMessage().subscribe :" + message);
         const msg: ChatMessage = JSON.parse(message);
         
         if (this.chatService.whoAmI() === "") return // we are logged in but socket is still on
@@ -112,7 +115,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   private updateScroll() {
-    console.log(this.location.path(true));
+    //console.log(this.location.path(true));
     // if we are not in the chat page, do not try to update the visual element
     // also if the user has not selected any corespodent, 
     // the div displaying the msg is not presented on the dom element, so
@@ -150,7 +153,8 @@ export class ChatComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log("Chat component destroyed");
+    //console.log("Chat component destroyed");
+    this.subscriptionToNewMessages.unsubscribe();
     this.chatService.clearSocketBuffer();
    }
 

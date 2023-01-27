@@ -2,7 +2,7 @@
 /// code based on 
 ///  https://github.com/cornflourblue/angular-10-registration-login-example/tree/master/src
 
-import { Injectable } from '@angular/core';
+import { Injectable, Optional, SkipSelf } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { HttpErrorResponse, HttpResponse } from "@angular/common/http";
@@ -32,13 +32,18 @@ export class ChatService {
     private user: User;
     public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
     private socket;
+    private previousMessage:string = "";
 
     constructor(
-        private router: Router,
         private http: HttpClient,
         private accountService: AccountService,
-
+        @Optional() @SkipSelf() sharedService?: ChatService
     ) {
+        console.log("ChatService created");
+        if (sharedService) {
+            throw new Error(
+              'ChatService is already created. ');
+          }
 
         this.accountService.getLoginStatusObservable().subscribe((isUserLoggedIn: boolean) => {
             console.log("isUserLoggedIn update: " + isUserLoggedIn + ". Socket status:" + ((this.socket == null) ? "null" : this.socket.username)); 
@@ -106,8 +111,11 @@ export class ChatService {
 
     public getNewMessage = () => {
         this.socket.on('message', (message) => {
-
-            this.messageSubject.next(message);
+            if (message != this.previousMessage){
+                this.previousMessage = message;
+                //console.log("this.socket.on('message', :" + message);
+                this.messageSubject.next(message);
+            }
         });
 
         return this.messageSubject.asObservable();
