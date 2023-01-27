@@ -3,7 +3,6 @@ import { LocationStrategy, PlatformLocation, Location } from '@angular/common';
 import { AccountService } from './_services/account.service';
 import { Observable, Subject } from 'rxjs';
 import { User } from './_models/user';
-import { ChatService } from './_services/chat.service';
 
 @Component({
   selector: 'app-root',
@@ -15,8 +14,7 @@ export class AppComponent implements OnInit, OnChanges {
 
   constructor(
     public location: Location,
-    private accountService: AccountService,
-    private chatService: ChatService
+    private accountService: AccountService
   ) { }
 
   ngOnChanges(changes: SimpleChanges): void {

@@ -32,7 +32,7 @@ export class ChatService {
     private user: User;
     public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
     private socket;
-    private previousMessage:string = "";
+    private previousMessage: string = "";
 
     constructor(
         private http: HttpClient,
@@ -42,27 +42,8 @@ export class ChatService {
         console.log("ChatService created");
         if (sharedService) {
             throw new Error(
-              'ChatService is already created. ');
-          }
-
-        this.accountService.getLoginStatusObservable().subscribe((isUserLoggedIn: boolean) => {
-            console.log("isUserLoggedIn update: " + isUserLoggedIn + ". Socket status:" + ((this.socket == null) ? "null" : this.socket.username)); 
-            // if we are not yet connected...
-            if ((!this.isUserLoggedIn && isUserLoggedIn) || this.socket == null) {
-               this.connectSocket();
-            }
-            this.isUserLoggedIn = isUserLoggedIn;
-            if (isUserLoggedIn) {
-                if (this.accountService.userValue != null) {
-                    this.usernameOfloggedInUser = this.accountService.userValue.username;
-                }
-            } else {
-                this.usernameOfloggedInUser = "";
-                // disconnect sockets.
-                this.socket.emit("logout");
-                this.socket = null;
-            }
-        });
+                'ChatService is already created. ');
+        }
     }
 
     private connectSocket() {
@@ -70,12 +51,39 @@ export class ChatService {
         this.socket = io('http://rheotome.eu:3000');
         this.socket.on("connect", () => {
             console.log("connecting socket " + this.socket.id); // x8WIv7-mJelg7on_ALbx
-        });
-        // and wait for credentials request.
-        this.socket.on("whoAreU", () => {
             this.socket.emit("setUsername", this.accountService.userValue.username, this.accountService.userValue.token);
-        });
+            this.socket.username = this.accountService.userValue.username;
+            this.socket.token = this.accountService.userValue.token;
 
+        });
+    }
+
+    public connectSocketAtLogin(username: string, token: string) {
+        // switching from not logged in to logged in, so connect
+        this.socket = io('http://rheotome.eu:3000');
+        this.socket.on("connect", () => {
+            console.log("connecting socket " + this.socket.id); // x8WIv7-mJelg7on_ALbx
+            this.socket.emit("setUsername", this.accountService.userValue.username, this.accountService.userValue.token);
+            this.socket.username = this.accountService.userValue.username;
+            this.socket.token = this.accountService.userValue.token;
+
+            this.accountService.getLoginStatusObservable().subscribe((isUserLoggedIn: boolean) => {
+                console.log("isUserLoggedIn update: " + isUserLoggedIn + ". Socket status:" + ((this.socket == null) ? "null" : this.socket.username)); 
+                if (isUserLoggedIn) {
+                    if (this.accountService.userValue != null) {
+                        this.usernameOfloggedInUser = this.accountService.userValue.username;
+                        this.socket.emit("setUsername", this.accountService.userValue.username, this.accountService.userValue.token);
+                        this.socket.username = this.accountService.userValue.username;
+                        this.socket.token = this.accountService.userValue.token;
+                    }
+                } else {
+                    this.usernameOfloggedInUser = "";
+                    // disconnect sockets.
+                    this.socket.emit("logout");
+                    this.socket.disconnect();
+                }
+            });
+        });
     }
 
     public disconnectSocket() {
@@ -86,7 +94,7 @@ export class ChatService {
     }
 
     public clearSocketBuffer() {
-        if (this.socket != null){
+        if (this.socket != null) {
             this.socket.sendBuffer = [];
         }
 
@@ -103,7 +111,7 @@ export class ChatService {
             to: toUser,
             message: msg
         }
-        if (this.socket != null){
+        if (this.socket != null) {
             this.socket.sendBuffer = [];
             this.socket.emit('message', JSON.stringify(chatMsg));
         }
@@ -111,7 +119,7 @@ export class ChatService {
 
     public getNewMessage = () => {
         this.socket.on('message', (message) => {
-            if (message != this.previousMessage){
+            if (message != this.previousMessage) {
                 this.previousMessage = message;
                 //console.log("this.socket.on('message', :" + message);
                 this.messageSubject.next(message);
