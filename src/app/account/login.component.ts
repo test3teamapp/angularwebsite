@@ -41,7 +41,7 @@ export class LoginComponent implements OnInit {
         this.loading = true;
         if (await this.accountService.login(this.f.username.value, this.f.password.value) != null) {
             //console.log("login successfull");
-            this.chatService.connectSocketAtLogin(this.accountService.userValue.username, this.accountService.userValue.token);
+            this.chatService.connectSocket(this.accountService.userValue.username, this.accountService.userValue.token);
             // get return url from query parameters or default to home page
             const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
             this.router.navigateByUrl(returnUrl);

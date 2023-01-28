@@ -48,7 +48,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
 
-     this.chatService.getLoggedInUsersFromDB().subscribe(
+     this.chatService.getOnlineUsersFromDB().subscribe(
       (data: any) => {
         // success path
         if (data.RESULT !== 'OK') {
@@ -92,9 +92,10 @@ export class ChatComponent implements OnInit, OnDestroy {
         if (msg.event) {
           if (msg.event.type === "disconnect") {
             if (msg.event.user === this.chatService.whoAmI()){
+              // the socket server notified us that the socket is closed from its' end
               this.chatService.disconnectSocket();
             }else {
-              // remove from user's list
+              // remove from online user's list
               this.usernames = this.usernames.filter(user => user != msg.event.user);
               this.chatService.showNotification(Alarmtype.WARNING, msg.message, 1);
             }

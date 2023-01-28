@@ -87,7 +87,8 @@ export class AccountService {
                 password: "",
                 firstName: "",
                 lastName: "",
-                token: data.token
+                token: data.token,
+                chat:"online"
             };
 
             localStorage.setItem('user', JSON.stringify(user));

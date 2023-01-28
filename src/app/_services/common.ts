@@ -73,6 +73,10 @@ export enum Alarmtype {
     token?:string;
   }
 
+  export interface SetOnlineStatusResult {
+    RESULT:string;
+  }
+
   export interface LoggedinUsersData {
     RESULT:string;
     users?:string[];

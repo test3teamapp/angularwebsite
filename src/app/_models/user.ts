@@ -4,5 +4,6 @@ export class User {
     password: string;
     firstName: string;
     lastName: string;
-    token: string;
+    token: string; // random string / loggedout
+    chat:string; // online / offline
 }
