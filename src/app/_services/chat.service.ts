@@ -18,7 +18,8 @@ import {
     Alarmtype,
     LoggedinUsersData,
     ChatMessage,
-    SetOnlineStatusResult
+    SetOnlineStatusResult,
+    ERROR_MESSAGE
 } from "./common";
 import { isUndefined } from 'util';
 
@@ -29,15 +30,14 @@ declare var $: any;
 @Injectable({ providedIn: 'root' })
 export class ChatService {
     private isUserLoggedIn: boolean;
-    private usernameOfloggedInUser: string = "";
     private user: User;
     public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
     private socket;
     private previousMessage: string = "";
 
     constructor(
+        private router: Router,
         private http: HttpClient,
-        private accountService: AccountService,
         @Optional() @SkipSelf() sharedService?: ChatService
     ) {
         console.log("ChatService created");
@@ -46,61 +46,60 @@ export class ChatService {
                 'ChatService is already created. ');
         }
 
-        if (this.socket == undefined){
-            if (this.accountService.userValue != null){
-                this.connectSocket(this.accountService.userValue.username, this.accountService.userValue.token);
-            }
-            
-        }
     }
 
-    public connectSocket(username: string, token: string) {
+    public setUser(user: User, dueToLogout:boolean) {
+        this.user = user;
+        // could be null
+        if (user === null) {
+            this.isUserLoggedIn = false;
+            if (this.socket != undefined) {
+                // disconnect sockets.
+                if (dueToLogout){
+                    this.socket.emit("logout");
+                }
+                this.socket.disconnect();
+            }
+            console.log("user logged out. Socket status:" + ((this.socket == null) ? "null" : this.socket.username));
+        }
+        else {            
+            this.isUserLoggedIn = true;
+            this.connectSocket();
+            this.socket.emit("setUsername", this.user.username, this.user.token);
+            this.socket.username = this.user.username;
+            this.socket.token = this.user.token;
+        }
+
+    }
+
+    public connectSocket() {
+        if (this.user === null || this.user === undefined) return;
         // switching from not logged in to logged in, so connect
         this.socket = io('http://rheotome.eu:3000');
         this.socket.on("connect", () => {
             console.log("connecting socket " + this.socket.id); // x8WIv7-mJelg7on_ALbx
-            this.socket.emit("setUsername", this.accountService.userValue.username, this.accountService.userValue.token);
-            this.socket.username = this.accountService.userValue.username;
-            this.socket.token = this.accountService.userValue.token;
+            this.socket.emit("setUsername", this.user.username, this.user.token);
+            this.socket.username = this.user.username;
+            this.socket.token = this.user.token;
 
             this.setOnlineStatus("online").subscribe(
                 (data: any) => {
-                  // success path
-                  if (data.RESULT !== 'OK') {
-                    this.showNotification(Alarmtype.WARNING, data.RESULT, 1);
-                  }else {
-                    this.showNotification(Alarmtype.SUCCESS, "Welcome " + this.accountService.userValue.username, 1);
-                  } 
+                    // success path
+                    if (data.RESULT !== 'OK') {
+                        this.showNotification(Alarmtype.WARNING, data.RESULT, 1);
+                    } else {
+                        this.showNotification(Alarmtype.SUCCESS, "Welcome " + this.user.username, 1);
+                    }
                 },
                 (error) => {
-                  this.showNotification(Alarmtype.DANGER, error, 1);
+                    this.showNotification(Alarmtype.DANGER, error, 1);
                 }, // error path
                 () => {
-                  //console.log("http call finished");
-                  //console.log("table rows number: " + this.tableData.dataRows.length);
-                  //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
+                    //console.log("http call finished");
+                    //console.log("table rows number: " + this.tableData.dataRows.length);
+                    //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
                 }
-              );
-
-            this.accountService.getLoginStatusObservable().subscribe((isUserLoggedIn: boolean) => {
-                console.log("isUserLoggedIn update: " + isUserLoggedIn + ". Socket status:" + ((this.socket == null) ? "null" : this.socket.username)); 
-                if (isUserLoggedIn) {
-                    if (this.accountService.userValue != null) {
-                        this.usernameOfloggedInUser = this.accountService.userValue.username;
-                        this.socket.emit("setUsername", this.accountService.userValue.username, this.accountService.userValue.token);
-                        this.socket.username = this.accountService.userValue.username;
-                        this.socket.token = this.accountService.userValue.token;
-                    }
-                } else {
-                    // the user logged out (by using the loggout button)
-                    // online status set to offline and token handling is done by the api 
-                    this.usernameOfloggedInUser = "";
-                    // disconnect sockets.
-                    this.socket.emit("logout");
-                    this.socket.disconnect();
-                    console.log("isUserLoggedIn update: " + isUserLoggedIn + ". Socket status:" + ((this.socket == null) ? "null" : this.socket.username));
-                }
-            });
+            );
         });
     }
 
@@ -115,20 +114,20 @@ export class ChatService {
 
         this.setOnlineStatus("offline").subscribe(
             (data: any) => {
-              // success path
-              if (data.RESULT !== 'OK') {
-                this.showNotification(Alarmtype.WARNING, data.RESULT, 1);
-              } 
+                // success path
+                if (data.RESULT !== 'OK') {
+                    this.showNotification(Alarmtype.WARNING, data.RESULT, 1);
+                }
             },
             (error) => {
-              this.showNotification(Alarmtype.DANGER, error, 1);
+                this.showNotification(Alarmtype.DANGER, error, 1);
             }, // error path
             () => {
-              //console.log("http call finished");
-              //console.log("table rows number: " + this.tableData.dataRows.length);
-              //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
+                //console.log("http call finished");
+                //console.log("table rows number: " + this.tableData.dataRows.length);
+                //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
             }
-          );
+        );
 
     }
 
@@ -140,13 +139,17 @@ export class ChatService {
     }
 
     public whoAmI(): string {
-        return this.usernameOfloggedInUser;
+        if (this.user != null && this.user != undefined) {
+            return this.user.username;
+        } else {
+            return "";
+        }
     }
 
     public sendMessage(toUser: string, msg: string) {
         let chatMsg: ChatMessage;
         chatMsg = {
-            from: this.accountService.userValue.username,
+            from: this.user.username,
             to: toUser,
             message: msg
         }
@@ -157,27 +160,21 @@ export class ChatService {
     }
 
     public getNewMessage = () => {
-        this.socket.on('message', (message) => {
-            if (message != this.previousMessage) {
-                this.previousMessage = message;
-                //console.log("this.socket.on('message', :" + message);
-                this.messageSubject.next(message);
-            }
-        });
+        if (this.socket != null && this.socket != undefined) {
+            this.socket.on('message', (message) => {
+                if (message != this.previousMessage) {
+                    this.previousMessage = message;
+                    //console.log("this.socket.on('message', :" + message);
+                    this.messageSubject.next(message);
+                }
+            });
+        }
 
         return this.messageSubject.asObservable();
     };
 
     async getOnlineUsers() {
 
-        var result = await this.accountService.verifyLogin();
-        //console.log(JSON.stringify(data));
-        if (!result) {
-            // not verified  credentialls
-            this.showNotification(Alarmtype.WARNING, "User not verified. Leave CHAT !", 1);
-            return null;
-        }
-        // continue
         var data = await this.getOnlineUsersFromDB().toPromise();
         //console.log(JSON.stringify(data));
         if (data.RESULT !== 'OK') {
@@ -201,10 +198,10 @@ export class ChatService {
             );
     }
 
-    public setOnlineStatus(status:string): Observable<SetOnlineStatusResult> {
+    public setOnlineStatus(status: string): Observable<SetOnlineStatusResult> {
 
         return this.http
-            .get<LoggedinUsersData>(REDIS_API_ENDPOINT + "/userrepo/setchatstatus/" + status + "/byToken/" + this.accountService.userValue.token, {
+            .get<LoggedinUsersData>(REDIS_API_ENDPOINT + "/userrepo/setchatstatus/" + status + "/byToken/" + this.user.token, {
                 responseType: "json",
             })
             .pipe(

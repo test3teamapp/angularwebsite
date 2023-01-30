@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { first } from 'rxjs/operators';
 
 import { AccountService } from '../_services/account.service';
-import { ChatService } from 'app/_services/chat.service';
 
 @Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
@@ -17,7 +16,6 @@ export class LoginComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         private accountService: AccountService,
-        private chatService: ChatService
     ) { }
 
     ngOnInit() {
@@ -40,8 +38,7 @@ export class LoginComponent implements OnInit {
 
         this.loading = true;
         if (await this.accountService.login(this.f.username.value, this.f.password.value) != null) {
-            //console.log("login successfull");
-            this.chatService.connectSocket(this.accountService.userValue.username, this.accountService.userValue.token);
+            //console.log("login successfull");           
             // get return url from query parameters or default to home page
             const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
             this.router.navigateByUrl(returnUrl);

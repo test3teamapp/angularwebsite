@@ -29,8 +29,6 @@ import { ChatService } from 'app/_services/chat.service';
 })
 export class HomeComponent implements OnInit, OnDestroy {
   error: any;
-  private subscriptionToNewMessages:Subscription;
-  private previousMessage:string = "";
   // for last meeting graph
   public tableData: TableData;
   public graphData: GraphData;
@@ -266,36 +264,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
   }
 
-  ngOnInit( ) {
-
-    // subscribe to receive notifications of new chat messages
-    this.subscriptionToNewMessages = this.chatService.getNewMessage().subscribe((message: string) => {      
-      if (message != this.previousMessage){
-        this.previousMessage = message;
-        const msg: ChatMessage = JSON.parse(message);
-        
-        if (this.chatService.whoAmI() === "") return // we are not logged in !!! but socket is still on
-
-        if (msg.to === this.chatService.whoAmI()) { // msg are sent unicast
-          this.chatService.showNotification(Alarmtype.SUCCESS, msg.from + " says: " + msg.message, 1);
-        }
-
-        // handle user events "disconnect" / "connect"
-        if (msg.event) {
-          if (msg.event.type === "disconnect") {
-            if (msg.event.user === this.chatService.whoAmI()){
-              this.chatService.disconnectSocket();
-            }else {             
-              this.chatService.showNotification(Alarmtype.WARNING, msg.message, 1);
-            }
-          } else if (msg.event.type === "connect") {
-            if (msg.event.user != this.chatService.whoAmI()) {                            
-              this.chatService.showNotification(Alarmtype.INFO, msg.message, 1);
-            }
-          }
-        }
-      }
-    })
+  ngOnInit( ) {    
 
     this.graphSubtitleText = "latest in ..."
     this.placesSubtitleText = "in last ... month(s)"
@@ -335,8 +304,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // unsubscribe from chat
-    this.subscriptionToNewMessages.unsubscribe();
+
    }
 
 }

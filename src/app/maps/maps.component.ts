@@ -26,8 +26,7 @@ import { ChatService } from "app/_services/chat.service";
   styles: [".error {color: red;}"],
 })
 export class MapsComponent implements OnInit, OnDestroy {
-  private previousMessage:string = "";
-  private subscriptionToNewMessages:Subscription;
+
   error: any;
   headers: string[];
   spyrecord: SpyrecordClass;
@@ -416,36 +415,6 @@ From redis , the data comes in this form:
   }
 
   ngOnInit() {
-
-    // subscribe to receive notifications of new chat messages
-    this.subscriptionToNewMessages = this.chatService.getNewMessage().subscribe((message: string) => {      
-      if (message != this.previousMessage){
-        this.previousMessage = message;
-        const msg: ChatMessage = JSON.parse(message);
-        
-        if (this.chatService.whoAmI() === "") return // we are not logged in !!! but socket is still on
-
-        if (msg.to === this.chatService.whoAmI()) { // msg are sent unicast
-          this.chatService.showNotification(Alarmtype.SUCCESS, msg.from + " says: " + msg.message, 1);
-        }
-
-        // handle user events "disconnect" / "connect"
-        if (msg.event) {
-          if (msg.event.type === "disconnect") {
-            if (msg.event.user === this.chatService.whoAmI()){
-              this.chatService.disconnectSocket();
-            }else {             
-              this.chatService.showNotification(Alarmtype.WARNING, msg.message, 1);
-            }
-          } else if (msg.event.type === "connect") {
-            if (msg.event.user != this.chatService.whoAmI()) {                            
-              this.chatService.showNotification(Alarmtype.INFO, msg.message, 1);
-            }
-          }
-        }
-      }
-    })
-
     this.tableData1 = {
       headerRow: ["ID", "last seen", "lat", "lng"],
       dataRows: [],
@@ -455,7 +424,5 @@ From redis , the data comes in this form:
   }
 
   ngOnDestroy() { 
-    // unsubscribe from chat
-    this.subscriptionToNewMessages.unsubscribe();
   }
 }

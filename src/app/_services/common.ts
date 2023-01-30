@@ -1,3 +1,7 @@
+export enum ERROR_MESSAGE {
+  TOKEN_NOT_FOUND = "TOKEN NOT FOUND !"
+}
+
 export enum Alarmtype {
     NONE = "",
     INFO = "info",
