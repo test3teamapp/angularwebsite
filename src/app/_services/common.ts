@@ -75,6 +75,13 @@ export enum Alarmtype {
   export interface LoginCheckData {
     RESULT:string;
     token?:string;
+    expires?:string;
+  }
+
+  export interface TempLoginData {
+    RESULT:string;
+    username?:string;
+    password?:string;
   }
 
   export interface SetOnlineStatusResult {

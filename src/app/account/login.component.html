@@ -23,5 +23,13 @@
                 </button>
             </div>
         </form>
+        <form [formGroup]="visitorRequestForm" (ngSubmit)="onRequestVisitorId()">
+            <div class="form-group">
+                <button [disabled]="loading" class="btn btn-primary">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
+                    Request Visitor Credentials (5 minutes access)
+                </button>
+            </div>
+        </form>
     </div>
 </div>

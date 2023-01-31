@@ -74,7 +74,7 @@ export class ChatComponent implements OnInit, OnDestroy {
     );
 
     this.subscriptionToNewMessages = this.chatService.getNewMessage().subscribe((message: string) => {      
-      if (message != this.previousMessage){
+      if (message != ""){
         this.previousMessage = message;
         //console.log("getNewMessage().subscribe :" + message);
         const msg: ChatMessage = JSON.parse(message);

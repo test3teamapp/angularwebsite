@@ -16,7 +16,8 @@ import {
     Alarmtype,
     ChatMessage,
     ERROR_MESSAGE,
-    LoginCheckData
+    LoginCheckData,
+    TempLoginData
 } from "../_services/common";
 import { isUndefined } from 'util';
 import { ChatService } from './chat.service';
@@ -28,6 +29,7 @@ declare var $: any;
 @Injectable({ providedIn: 'root' })
 export class AccountService {
     private subscriptionToNewMessages: Subscription;
+    private subscriptionToExpirationOfUser: Subscription;
     private previousMessage: string = "";
     private logginCheck: boolean = false;
     private ignoreConnectionMessageOfThisUser = true; // we need to ignore the innitial message 
@@ -62,6 +64,7 @@ export class AccountService {
                         this.loginStatusSubject.next(this.logginCheck);
                         // subscribe to get messages to all pages
                         this.subscribeForChatMessages();
+                        this.subscribeForUseExpirationNotification();
                     }
                 },
                 (error) => {
@@ -75,14 +78,14 @@ export class AccountService {
         } else {
             this.userSubject.next(null);
             //console.log("setting chat user : null");
-            this.chatService.setUser(null,false);
+            this.chatService.setUser(null, false);
             console.log("AccountService : user = undefined");
         }
 
     }
 
-    private removeLocalCredentialsAndSockets(dueToLogout:boolean) {
-        this.chatService.setUser(null,dueToLogout);
+    private removeLocalCredentialsAndSockets(dueToLogout: boolean) {
+        this.chatService.setUser(null, dueToLogout);
         this.logginCheck = false;
         this.loginStatusSubject.next(this.logginCheck);
         // remove user from local storage and set current user to null
@@ -92,13 +95,28 @@ export class AccountService {
         if (this.subscriptionToNewMessages != undefined) {
             this.subscriptionToNewMessages.unsubscribe();
         }
+        if (this.subscriptionToExpirationOfUser != undefined){
+            this.subscriptionToExpirationOfUser.unsubscribe();
+        }
         this.router.navigate(['/account/login']);
+    }
+
+    private subscribeForUseExpirationNotification() {
+        // subscribe to receive notification when the user login credentials get expired
+        this.subscriptionToExpirationOfUser = this.chatService.getUserExpiration().subscribe((isExpired: boolean) => {
+            if (isExpired) {
+                console.log("user expired. deleting local stored user data and logging out ");
+                this.chatService.showNotification(Alarmtype.WARNING, "YOU ARE EXPIRED. GET OUT !", 3);
+                this.removeLocalCredentialsAndSockets(true);                
+            }
+
+        })
     }
 
     private subscribeForChatMessages() {
         // subscribe to receive notifications of new chat messages
         this.subscriptionToNewMessages = this.chatService.getNewMessage().subscribe((message: string) => {
-            if (message != this.previousMessage) {
+            if (message != "") {
                 this.previousMessage = message;
                 const msg: ChatMessage = JSON.parse(message);
                 //console.log("router.url = " + this.router.url);
@@ -176,7 +194,41 @@ export class AccountService {
         return this.rand() + this.rand();
     };
 
-    async login(username: string, password: string) {
+    public async requestVisitorId() {
+
+        var data = await this.requestTempUser().toPromise();
+        //console.log(JSON.stringify(data));
+        if (data.RESULT !== 'OK') {
+            //console.log(" Response message: " + data.RESULT);
+            this.showNotification(Alarmtype.WARNING, data.RESULT, 1);
+            return null;
+        } else {
+            const user = {
+                id: "",
+                username: data.username,
+                password: data.password,
+                firstName: "",
+                lastName: "",
+                token: "",
+                chat: "",
+                expires: ""
+            };
+            return user;
+        }
+    }
+
+    private requestTempUser(): Observable<TempLoginData> {
+        return this.http
+            .get<TempLoginData>(REDIS_API_ENDPOINT + "/userrepo/tempvisitor", {
+                responseType: "json",
+            })
+            .pipe(
+                map(response => response as TempLoginData),
+                catchError(this.handleError) // then handle the error
+            );
+    }
+
+    public async login(username: string, password: string) {
         this.logginCheck = false;
         this.loginStatusSubject.next(this.logginCheck);
 
@@ -202,7 +254,8 @@ export class AccountService {
                 firstName: "",
                 lastName: "",
                 token: data.token,
-                chat: "online"
+                chat: "online",
+                expires: data.expires
             };
 
             localStorage.setItem('user', JSON.stringify(user));
@@ -212,6 +265,7 @@ export class AccountService {
             this.chatService.setUser(this.userSubject.value, false); // first do this !!!!!
             // subscribe to get messages to all pages
             this.subscribeForChatMessages();
+            this.subscribeForUseExpirationNotification();
 
             return user;
         } else {

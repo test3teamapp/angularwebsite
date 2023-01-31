@@ -31,7 +31,8 @@ declare var $: any;
 export class ChatService {
     private isUserLoggedIn: boolean;
     private user: User;
-    public messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
+    private messageSubject: BehaviorSubject<string> = new BehaviorSubject('');
+    private userExpirationSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
     private socket;
     private previousMessage: string = "";
 
@@ -75,7 +76,7 @@ export class ChatService {
     public connectSocket() {
         if (this.user === null || this.user === undefined) return;
         // switching from not logged in to logged in, so connect
-        this.socket = io('http://rheotome.eu:3000');
+        this.socket = io(environment.socketiochatEndpoint);
         this.socket.on("connect", () => {
             console.log("connecting socket " + this.socket.id); // x8WIv7-mJelg7on_ALbx
             this.socket.emit("setUsername", this.user.username, this.user.token);
@@ -100,6 +101,16 @@ export class ChatService {
                     //console.log("getListOfLastSpyrecordsForAllUsers : error: " + this.error);
                 }
             );
+        });
+
+        this.socket.on("sendExpiration", () => {
+            //console.log("socket request to sendExpiration ");
+            this.socket.emit("checkExpiration", this.user.expires);            
+        });
+
+        this.socket.on("expired", () => {
+            console.log("socket notified of expiration "); 
+            this.userExpirationSubject.next(true);                      
         });
     }
 
@@ -166,12 +177,20 @@ export class ChatService {
                     this.previousMessage = message;
                     //console.log("this.socket.on('message', :" + message);
                     this.messageSubject.next(message);
+                    this.messageSubject.next(""); // to check further down the line at the subscribers
+                                                 // and avoid useless popo ups
                 }
             });
         }
 
         return this.messageSubject.asObservable();
     };
+
+    public getUserExpiration = () => {
+
+        return this.userExpirationSubject.asObservable();
+    };
+
 
     async getOnlineUsers() {
 

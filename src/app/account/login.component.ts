@@ -8,6 +8,7 @@ import { AccountService } from '../_services/account.service';
 @Component({ templateUrl: 'login.component.html' })
 export class LoginComponent implements OnInit {
     form: FormGroup;
+    visitorRequestForm: FormGroup;
     loading = false;
     submitted = false;
 
@@ -23,6 +24,7 @@ export class LoginComponent implements OnInit {
             username: ['', Validators.required],
             password: ['', Validators.required]
         });
+        this.visitorRequestForm = this.formBuilder.group({});
     }
 
     // convenience getter for easy access to form fields
@@ -48,4 +50,12 @@ export class LoginComponent implements OnInit {
             this.loading = false;
         }
     }
+
+   async onRequestVisitorId() {
+    const tempuser = await this.accountService.requestVisitorId();
+    if (tempuser != null) {
+          
+        this.form.setValue({username: tempuser.username, password: tempuser.password});
+    } 
+   }
 }

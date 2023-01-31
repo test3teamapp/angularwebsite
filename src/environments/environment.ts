@@ -5,7 +5,8 @@
 
 export const environment = {
   production: false,
-  redisapiEndpoint: 'http://rheotome.eu:8084',
+  redisapiEndpoint: 'http://rheotome.eu:8085',
+  socketiochatEndpoint:'http://rheotome.eu:3001',
   firebaseServerEndpointUrl: 'https://158.101.171.124:8082/api/v1/',
   endpointUrl: "https://158.101.171.124:8081/api/v1/",
   reconnectInterval: 2000

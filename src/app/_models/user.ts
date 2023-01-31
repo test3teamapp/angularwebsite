@@ -6,4 +6,5 @@ export class User {
     lastName: string;
     token: string; // random string / loggedout
     chat:string; // online / offline
+    expires:string; // "never" / timestamp
 }
